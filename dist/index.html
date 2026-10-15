@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f1f0e9">
+  <meta name="description" content="木序 WOODWEAVE：以四、五、六面體構成、能持續向外生長的木質建築。自由旋轉、縮放、剖面與探索獨特房間。">
+  <title>木序 WOODWEAVE — 九層菱形聚落</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%234c6051' d='M32 2 58 17v30L32 62 6 47V17z'/%3E%3Cpath fill='none' stroke='%23eee9dc' stroke-width='3' d='m6 17 26 15 26-15M32 32v30M19 10l26 15v30M45 10 19 25v30'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <svg class="icon-defs" aria-hidden="true"><defs>
+    <symbol id="i-hex" viewBox="0 0 40 44"><path d="m20 2 17 10v20L20 42 3 32V12Z M3 12l17 10 17-10 M20 22v20 M11.5 7l17 10v20 M28.5 7l-17 10v20"/></symbol>
+    <symbol id="i-orbit" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-30 12 12)"/><path d="M6 7V3H2 M18 17v4h4"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-top" viewBox="0 0 24 24"><path d="m12 3 9 5v9l-9 5-9-5V8Z M3 8l9 5 9-5 M12 13v9"/></symbol>
+    <symbol id="i-front" viewBox="0 0 24 24"><path d="m12 2 10 10-10 10L2 12Z M4 12h16 M7 7h10 M7 17h10 M8 8v8m8-8v8"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 6h5l2-3h4l2 3h5v14H3Z"/><circle cx="12" cy="12" r="4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+    <symbol id="i-four" viewBox="0 0 32 30"><path d="M16 2 2 25l28 1Z M16 2l1 19L2 25m15-4 13 5"/></symbol>
+    <symbol id="i-five" viewBox="0 0 32 30"><path d="m2 17 14-15 14 15-14 11Z M2 17h28 M16 2v13m0 0v13 M2 17l14-2 14 2"/></symbol>
+    <symbol id="i-six" viewBox="0 0 32 30"><path d="m16 1 14 8v13l-14 7L2 22V9Z M2 9l14 8 14-8 M16 17v12"/></symbol>
+  </defs></svg>
+  <header class="header">
+    <a class="brand" href="./" aria-label="木序首頁"><svg class="brand-symbol"><use href="#i-hex"/></svg><span class="brand-cn">木序</span><span class="brand-line"></span><span class="brand-en">WOODWEAVE</span></a>
+    <div class="header-center">九層斜向木構 · 中段擴張，上下收尖</div>
+    <div class="header-meta"><span class="status-dot"></span> LIVE 3D <span class="header-edition">/ ATELIER 03</span></div>
+  </header>
+  <main>
+    <aside class="sidebar" id="sidebar">
+      <div class="intro">
+        <p class="eyebrow">MODULAR LIVING SYSTEM</p>
+        <h1>向上，<br>生長成菱形<span>。</span></h1>
+        <p class="intro-copy">九層錯位，懸起一座木質聚落。<br>中間豐盛，上下輕盈，每間各有不同。</p>
+      </div>
+      <div class="controls">
+        <section class="control-section scale-section">
+          <div class="section-label"><span>01 <b>聚落尺度</b></span><span class="mono">GROWTH</span></div>
+          <div class="room-total"><span id="room-count">180</span><span>個獨特房間<small>本次上限 360 間</small></span></div>
+          <input id="room-range" type="range" min="36" max="360" step="6" value="180" aria-label="房間數量">
+          <div class="range-ends"><span>36</span><span>360</span></div>
+          <button id="grow" class="grow-button"><svg><use href="#i-plus"/></svg>向外生長<span>＋36 間</span></button>
+        </section>
+        <section class="control-section">
+          <div class="section-label"><span>02 <b>觀察方式</b></span><span class="mono">EXPLORE</span></div>
+          <div class="segments" role="group" aria-label="觀察模式">
+            <button class="active" data-mode="exterior" aria-pressed="true">建築外觀</button>
+            <button data-mode="cutaway" aria-pressed="false">打開剖面</button><button data-mode="structure" aria-pressed="false">支撐骨架</button>
+          </div>
+          <div id="floor-controls"><div class="floor-row"><span>9 層 · 分層房間數</span><button data-floor="-1" class="all-floors active" aria-pressed="true">顯示全部</button></div><div class="floor-profile" id="floor-profile" role="group" aria-label="由九樓至一樓的房間分布"></div></div>
+          <div class="explode-label"><label for="explode">樓層展開</label><output id="explode-value">0%</output></div>
+          <input id="explode" type="range" min="0" max="100" value="0" aria-label="樓層展開程度">
+        </section>
+        <section class="control-section modules-section">
+          <div class="section-label"><span>03 <b>構成語彙</b></span><span class="mono">POLYHEDRA</span></div>
+          <div class="module-legend"><div><svg><use href="#i-four"/></svg><span>四面體</span><b id="count-four">—</b></div><div><svg><use href="#i-five"/></svg><span>五面體</span><b id="count-five">—</b></div><div><svg><use href="#i-six"/></svg><span>六面體</span><b id="count-six">—</b></div></div>
+          <p class="module-note">雙側巨柱 · 中央核心 · 樓層桁架<br>支撐概念模型，尚未進行承載驗算。</p>
+        </section>
+      </div>
+      <div class="sidebar-footer"><span class="material-dot"></span> OAK / WOOL FELT / SOFT LIGHT <span>↗</span></div>
+    </aside>
+    <section id="viewport" class="viewport" aria-label="可旋轉及縮放的木質建築 3D 模型">
+      <canvas id="scene" tabindex="0" aria-label="建築模型。拖曳旋轉，滾輪縮放，右鍵平移；點選房間後可進入。方向鍵旋轉，加減鍵縮放，Home 返回全景。"></canvas>
+      <div class="scene-caption"><span class="caption-rule"></span><div><span class="mono" id="scene-label">01 / THE INCLINED DIAMOND</span><small id="scene-description">九層菱形聚落 · 中段最寬</small></div></div>
+      <details class="quality-panel" id="quality-panel">
+        <summary><span class="quality-dot"></span><span id="quality-label">細節 · 自動</span></summary>
+        <div class="quality-body">
+          <label for="quality">觀看品質</label>
+          <select id="quality" aria-label="觀看品質"><option value="auto">自動 · 近看完整細節</option><option value="ultra">極致 · 整棟完整細節</option><option value="eco">輕盈 · 降低畫面負荷</option></select>
+          <p>每房皆有精細內裝。自動模式依觀看距離調整曲面與微小零件；走進房間可查看完整細節。</p>
+          <button id="run-test" class="test-button">測試 180／360 間負載</button>
+          <button id="stop-test" class="test-button" hidden>停止測試</button>
+          <output id="perf-live">準備就緒 · 靜止時暫停繪圖</output>
+          <p class="test-note">約 3 分鐘，包含全景、剖面、單房及反覆切換。請讓分頁保持開啟。結果只代表當前視窗與裝置。</p>
+          <div id="test-summary" role="status" aria-live="polite"></div>
+          <details id="test-results" hidden><summary>查看測試紀錄</summary><pre id="test-json"></pre></details>
+        </div>
+      </details>
+      <div class="compass" aria-hidden="true"><span>N</span><div id="compass-needle">↑</div><i></i></div>
+      <div class="vertical-tools"><button id="zoom-in" title="拉近" aria-label="拉近">＋</button><button id="zoom-out" title="拉遠" aria-label="拉遠">−</button><span></span><button id="reset" title="返回全景" aria-label="返回全景"><svg><use href="#i-expand"/></svg></button></div>
+      <div id="loader" class="loader"><svg><use href="#i-hex"/></svg><span>正在編織你的聚落</span><small>WOODWEAVE / GENERATING</small></div>
+      <div id="tooltip" class="tooltip" hidden></div>
+      <button id="back" class="back-button" hidden>← 返回聚落</button>
+      <article class="room-card" id="room-card">
+        <div class="room-card-top"><button id="toggle-room-info" class="info-toggle" aria-label="收合房間資訊" aria-expanded="true">−</button><span class="eyebrow">A SPACE OF YOUR OWN</span><div class="room-arrows"><button id="prev-room" aria-label="上一個房間">←</button><button id="next-room" aria-label="下一個房間">→</button></div></div>
+        <div class="room-title"><span id="selected-id">R–001</span><span class="room-tag" id="selected-level">1F</span></div>
+        <h2 id="selected-name">靜謐起居室</h2>
+        <p id="selected-desc">每一間，都有自己的生活節奏。</p>
+        <button id="focus-furniture" class="furniture-focus" hidden>近看家具與材質 ↗</button>
+        <div class="hero-note"><span>本房專屬 · UNIQUE OBJECT</span><strong id="hero-name"></strong><button id="focus-hero" aria-label="聚焦本房專屬裝置">近看 ↗</button><p id="hero-description"></p></div>
+        <div class="room-facts"><span id="selected-type">六面體</span><span id="selected-area">35.5 m²</span><span id="selected-material">自然橡木</span></div>
+        <div class="room-palette"><span id="swatch-wood"></span><span id="swatch-accent"></span><span class="swatch-white"></span><small id="selected-feature">線性燈 × 懸浮家具</small></div>
+        <button id="enter-room" class="enter-button">走進這個房間<svg><use href="#i-arrow"/></svg></button>
+      </article>
+      <div class="scene-toolbar" role="group" aria-label="視角與燈光">
+        <button id="view-axon" class="active" title="軸測視角" aria-label="軸測視角"><svg><use href="#i-top"/></svg><span>軸測</span></button>
+        <button id="view-top" title="俯瞰平面" aria-label="俯瞰平面"><svg><use href="#i-eye"/></svg><span>俯瞰</span></button>
+        <button id="view-front" title="正立面" aria-label="正立面"><svg><use href="#i-front"/></svg><span>正面</span></button>
+        <span class="toolbar-divider"></span>
+        <button id="rotate" title="自動環繞" aria-label="自動環繞" aria-pressed="false"><svg><use href="#i-orbit"/></svg><span>環繞</span></button>
+        <button id="night" title="日夜切換" aria-label="日夜切換" aria-pressed="false"><svg id="night-icon"><use href="#i-sun"/></svg><span id="night-label">日光</span></button>
+        <span class="toolbar-divider"></span>
+        <button id="snapshot" title="儲存模型圖片" aria-label="儲存模型圖片"><svg><use href="#i-camera"/></svg></button>
+      </div>
+      <div class="scene-footer"><span class="desktop-hint">拖曳旋轉 <i>·</i> 滾輪縮放 <i>·</i> 右鍵平移 <i>·</i> 點選房間</span><span class="touch-hint">單指旋轉 · 雙指縮放／平移 · 點選房間</span><span class="mono" id="view-status">PERSPECTIVE / 9 LEVELS</span></div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </section>
+    <button class="mobile-controls" id="mobile-controls" aria-expanded="false">☷ 調整聚落</button>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
