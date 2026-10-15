@@ -3,9 +3,9 @@ import {readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {Script} from 'node:vm';
 import * as T from './dist/vendor/three.module.min.js';
-import {generateRooms,getStats,buildingRadius,LEVELS,FLOOR_WEIGHTS,getSupportPlan,getEnvelope,floorOffset,MAX_ROOMS,LABEL_COLUMNS,LABEL_ROWS} from './dist/layout.js';
+import {generateRooms,getStats,buildingRadius,LEVELS,FLOOR_WEIGHTS,getSupportPlan,getEnvelope,floorOffset,MAX_ROOMS,DESIGN_ROOMS,LABEL_COLUMNS,LABEL_ROWS} from './dist/layout.js';
 import {buildHabitat,buildStructure,buildRoom,disposeModel,setModelDetail} from './dist/model.js';
-for(const n of [36,72,180,216,360,720,1080]){
+for(const n of [36,72,180,216,360,540,720,1080]){
   const rooms=generateRooms(n),stats=getStats(rooms);
   assert.equal(rooms.length,n);assert.equal(new Set(rooms.map(r=>r.key)).size,n);
   assert.equal(new Set(rooms.map(r=>r.signature)).size,n);
@@ -22,11 +22,11 @@ for(const n of [36,72,180,216,360,720,1080]){
   }
   console.log(JSON.stringify({n,...stats,radius:buildingRadius(rooms)}));
 }
-assert.equal(MAX_ROOMS,1080);
+assert.equal(MAX_ROOMS,540);assert.equal(DESIGN_ROOMS,1080);
 assert.deepEqual(generateRooms(1080).slice(0,360),generateRooms(360),'Growth must preserve existing rooms and interiors');
 assert.equal(LABEL_COLUMNS*LABEL_ROWS,1080);
 assert.deepEqual(getStats(generateRooms(180)).perFloor,FLOOR_WEIGHTS);assert.ok(floorOffset(8)[0]>floorOffset(0)[0]);
-const materials=Object.fromEntries(['wood','timber','white','dark','metal','fabric','glass','roofglass','wall','stone','leaves','soil','light','screen','cyan','ceramic','paper','label','contact','felt','woodfelt'].map(name=>[name,new T.MeshStandardMaterial()]));
+const materials=Object.fromEntries(['wood','timber','white','dark','metal','fabric','glass','roofglass','wall','stone','leaves','soil','light','screen','cyan','ceramic','paper','label','contact','felt','woodfelt','woodend','crystal','cloth','thread'].map(name=>[name,name==='thread'?new T.LineBasicMaterial():new T.MeshStandardMaterial()]));
 const rooms=generateRooms(MAX_ROOMS),habitat=buildHabitat(rooms,materials);let drawBatches=0,instances=0,triangles=0;
 assert.equal(habitat.layers.length,9);
 assert.equal(new Set(habitat.pickables.flatMap(mesh=>mesh.userData.rooms.filter(id=>id>=0))).size,MAX_ROOMS,'Every room must remain pickable');
@@ -44,9 +44,24 @@ disposeModel(habitat.root);
 // Compare actual furniture geometry, transforms and colors. Ignore the label UVs
 // so different room numbers alone cannot make identical interiors pass.
 const interiorFingerprints=new Set();
-for(const room of rooms){
+const inspectedGeometry=new Set();let maxCraftTriangles=0,maxCraftLineSegments=0,minCraftLineSegments=Infinity;
+for(const room of generateRooms(DESIGN_ROOMS)){
   const model=buildRoom(room,materials),digest=createHash('sha256');
-  for(const mesh of model.categories.furniture.children){
+  assert.equal(model.root.userData.craftEdition,5);assert.ok(model.categories.atelier);
+  let roomTriangles=0,roomLines=0;
+  model.root.traverse(o=>{
+    if(!o.geometry)return;
+    if(!inspectedGeometry.has(o.geometry)){
+      for(const attr of Object.values(o.geometry.attributes))assert.ok(attr.array.every(Number.isFinite));
+      inspectedGeometry.add(o.geometry);
+    }
+    if(o.instanceMatrix)assert.ok(o.instanceMatrix.array.every(Number.isFinite));
+    if(o.isLineSegments)roomLines+=o.geometry.attributes.position.count/2;
+    if(o.isMesh)roomTriangles+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3*(o.count||1);
+  });
+  maxCraftTriangles=Math.max(maxCraftTriangles,roomTriangles);maxCraftLineSegments=Math.max(maxCraftLineSegments,roomLines);minCraftLineSegments=Math.min(minCraftLineSegments,roomLines);
+  assert.ok(roomLines>1500,'Each suite must have actual fiber and stitched line geometry');
+  for(const mesh of [...model.categories.furniture.children,...model.categories.atelier.children]){
     digest.update(mesh.geometry.type);
     for(const attribute of [mesh.geometry.attributes.position,mesh.instanceMatrix,mesh.instanceColor]){
       if(!attribute)continue;
@@ -56,8 +71,8 @@ for(const room of rooms){
   }
   interiorFingerprints.add(digest.digest('hex'));disposeModel(model.root);
 }
-assert.equal(interiorFingerprints.size,MAX_ROOMS,'Rendered room furniture must be distinct, independently of names or plaques');
+assert.equal(interiorFingerprints.size,DESIGN_ROOMS,'Rendered library furniture must be distinct, independently of names or plaques');
 const supports=buildStructure(rooms,materials);assert.equal(supports.root.userData.extraColumns,2);assert.equal(supports.plan.core.height>30,true);assert.equal(supports.plan.bearingVerification,'NOT_ANALYSED');supports.root.traverse(o=>{if(o.isInstancedMesh)assert.ok(o.instanceMatrix.array.every(Number.isFinite));});disposeModel(supports.root);
 const html=await readFile(new URL('./dist/standalone.html',import.meta.url),'utf8');assert.ok(!/<script[^>]+src=/.test(html));assert.ok(!/<link[^>]+rel="stylesheet"/.test(html));
 const bundledScript=html.match(/<script>\n([\s\S]*)\n<\/script>/)?.[1];assert.ok(bundledScript);new Script(bundledScript,{filename:'woodweave-standalone.js'});
-console.log(JSON.stringify({nineFloors:'PASS',diamondRoomDistribution:'PASS',twoSideColumns:'PASS',rooms:MAX_ROOMS,uniqueHeroPerRoom:'PASS',uniqueFurnitureGeometry:interiorFingerprints.size,distinctPhysicalPlaques:labelCells.size,strengthAnalysis:'NOT_ANALYSED',stableExtension:'PASS',geometry:'PASS',allThreeRoomTypes:'PASS',selfContained:'PASS',drawBatches,instances,triangles}));
+console.log(JSON.stringify({nineFloors:'PASS',diamondRoomDistribution:'PASS',twoSideColumns:'PASS',activeRooms:MAX_ROOMS,designLibrary:DESIGN_ROOMS,uniqueHeroPerRoom:'PASS',uniqueFurnitureGeometry:interiorFingerprints.size,distinctPhysicalPlaques:labelCells.size,strengthAnalysis:'NOT_ANALYSED',stableExtension:'PASS',geometry:'PASS',allThreeRoomTypes:'PASS',selfContained:'PASS',drawBatches,instances,triangles,craft:{edition:5,roomsChecked:DESIGN_ROOMS,maxTriangles:maxCraftTriangles,lineSegments:[minCraftLineSegments,maxCraftLineSegments],finiteCoordinates:'PASS'}}));

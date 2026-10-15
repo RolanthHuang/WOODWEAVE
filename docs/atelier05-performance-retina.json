@@ -1,0 +1,464 @@
+{
+  "edition": "ATELIER_05_CRAFT",
+  "status": "COMPLETED",
+  "reason": null,
+  "viewport": {
+    "width": 1616,
+    "height": 1004,
+    "devicePixelRatio": 2,
+    "renderWidth": 3232,
+    "renderHeight": 2008
+  },
+  "criteria": {
+    "averageFPSMin": 45,
+    "frameP99msMax": 28,
+    "framesOver50msMax": 0
+  },
+  "initialResources": {
+    "geometries": 87,
+    "textures": 31,
+    "jsHeapMB": 36.6
+  },
+  "buildTimes": [
+    {
+      "name": "540 間・極致全景",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "540 間・極致近景",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "540 間・快速旋轉與縮放",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "540 間・極致剖面",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "單房・材質近看",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "羊毛氈沙發與織物",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "稜晶裝置與加工細節",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "單房・快速旋轉與微距縮放",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "24 次換房與反覆增建",
+      "reused": true,
+      "milliseconds": 0
+    }
+  ],
+  "results": [
+    {
+      "name": "540 間・極致全景",
+      "rooms": 540,
+      "quality": "ultra",
+      "mode": "exterior",
+      "view": "overview",
+      "detail": "FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 1001,
+      "seconds": 20.02,
+      "averageFPS": 50,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "OVERVIEW"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.1,
+      "frameP99ms": 20.7,
+      "maxFrameMs": 21,
+      "framesOver50ms": 0,
+      "meanSubmissionMs": 2.68,
+      "maxDrawCalls": 700,
+      "maxTriangles": 12335679,
+      "resources": {
+        "geometries": 87,
+        "textures": 31,
+        "jsHeapMB": 35.1
+      },
+      "contextLosses": 0,
+      "rapidInteraction": null,
+      "smoothnessPass": true
+    },
+    {
+      "name": "540 間・極致近景",
+      "rooms": 540,
+      "quality": "ultra",
+      "mode": "exterior",
+      "view": "near",
+      "detail": "FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 3001,
+      "seconds": 60.02,
+      "averageFPS": 50,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "CLOSE_2K"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.1,
+      "frameP99ms": 20.8,
+      "maxFrameMs": 21.1,
+      "framesOver50ms": 0,
+      "meanSubmissionMs": 2.76,
+      "maxDrawCalls": 698,
+      "maxTriangles": 12335055,
+      "resources": {
+        "geometries": 87,
+        "textures": 31,
+        "jsHeapMB": 55.2
+      },
+      "contextLosses": 0,
+      "rapidInteraction": null,
+      "smoothnessPass": true
+    },
+    {
+      "name": "540 間・快速旋轉與縮放",
+      "rooms": 540,
+      "quality": "ultra",
+      "mode": "exterior",
+      "view": "rapid",
+      "detail": "FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 3000,
+      "seconds": 60,
+      "averageFPS": 50,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "OVERVIEW",
+        "CLOSE_2K"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.9,
+      "frameP99ms": 21,
+      "maxFrameMs": 21.1,
+      "framesOver50ms": 0,
+      "meanSubmissionMs": 2.71,
+      "maxDrawCalls": 700,
+      "maxTriangles": 12335679,
+      "resources": {
+        "geometries": 87,
+        "textures": 31,
+        "jsHeapMB": 43.3
+      },
+      "contextLosses": 0,
+      "rapidInteraction": {
+        "zoomToggles": 76,
+        "zoomIntervalMs": 800,
+        "rotationRadians": 131.96,
+        "rotationSpeedRadiansPerSecond": 2.2,
+        "cameraDistance": [
+          12.63,
+          193.12
+        ],
+        "fixedQuality": true
+      },
+      "smoothnessPass": true
+    },
+    {
+      "name": "540 間・極致剖面",
+      "rooms": 540,
+      "quality": "ultra",
+      "mode": "cutaway",
+      "view": "overview",
+      "detail": "FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 601,
+      "seconds": 12.02,
+      "averageFPS": 50,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "OVERVIEW"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.9,
+      "frameP99ms": 21,
+      "maxFrameMs": 21,
+      "framesOver50ms": 0,
+      "meanSubmissionMs": 2.27,
+      "maxDrawCalls": 556,
+      "maxTriangles": 11385492,
+      "resources": {
+        "geometries": 87,
+        "textures": 31,
+        "jsHeapMB": 52.2
+      },
+      "contextLosses": 0,
+      "rapidInteraction": null,
+      "smoothnessPass": true
+    },
+    {
+      "name": "單房・材質近看",
+      "rooms": 540,
+      "quality": "ultra",
+      "mode": "interior",
+      "view": "interior",
+      "detail": "ROOM_FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 601,
+      "seconds": 12.02,
+      "averageFPS": 50,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "CRAFT_2K"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.9,
+      "frameP99ms": 21,
+      "maxFrameMs": 21,
+      "framesOver50ms": 0,
+      "meanSubmissionMs": 1.13,
+      "maxDrawCalls": 51,
+      "maxTriangles": 134976,
+      "resources": {
+        "geometries": 99,
+        "textures": 32,
+        "jsHeapMB": 52.7
+      },
+      "contextLosses": 0,
+      "rapidInteraction": null,
+      "smoothnessPass": true
+    },
+    {
+      "name": "羊毛氈沙發與織物",
+      "rooms": 540,
+      "quality": "ultra",
+      "mode": "interior",
+      "view": "interior",
+      "detail": "ROOM_FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 602,
+      "seconds": 12.04,
+      "averageFPS": 50,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "CRAFT_2K"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.9,
+      "frameP99ms": 21,
+      "maxFrameMs": 21,
+      "framesOver50ms": 0,
+      "meanSubmissionMs": 0.9,
+      "maxDrawCalls": 40,
+      "maxTriangles": 50424,
+      "resources": {
+        "geometries": 106,
+        "textures": 32,
+        "jsHeapMB": 30.9
+      },
+      "contextLosses": 0,
+      "rapidInteraction": null,
+      "smoothnessPass": true
+    },
+    {
+      "name": "稜晶裝置與加工細節",
+      "rooms": 540,
+      "quality": "ultra",
+      "mode": "interior",
+      "view": "interior",
+      "detail": "ROOM_FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 601,
+      "seconds": 12.02,
+      "averageFPS": 50,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "CRAFT_2K"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.9,
+      "frameP99ms": 21,
+      "maxFrameMs": 21.1,
+      "framesOver50ms": 0,
+      "meanSubmissionMs": 0.83,
+      "maxDrawCalls": 37,
+      "maxTriangles": 135701,
+      "resources": {
+        "geometries": 111,
+        "textures": 33,
+        "jsHeapMB": 31.1
+      },
+      "contextLosses": 0,
+      "rapidInteraction": null,
+      "smoothnessPass": true
+    },
+    {
+      "name": "單房・快速旋轉與微距縮放",
+      "rooms": 540,
+      "quality": "ultra",
+      "mode": "interior",
+      "view": "rapid",
+      "detail": "ROOM_FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 1501,
+      "seconds": 30.02,
+      "averageFPS": 50,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "CRAFT_2K"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.9,
+      "frameP99ms": 21,
+      "maxFrameMs": 21,
+      "framesOver50ms": 0,
+      "meanSubmissionMs": 1.02,
+      "maxDrawCalls": 45,
+      "maxTriangles": 114230,
+      "resources": {
+        "geometries": 112,
+        "textures": 34,
+        "jsHeapMB": 32.3
+      },
+      "contextLosses": 0,
+      "rapidInteraction": {
+        "zoomToggles": 38,
+        "zoomIntervalMs": 800,
+        "rotationRadians": 66,
+        "rotationSpeedRadiansPerSecond": 2.2,
+        "cameraDistance": [
+          2.41,
+          9.97
+        ],
+        "fixedQuality": true
+      },
+      "smoothnessPass": true
+    },
+    {
+      "name": "24 次換房與反覆增建",
+      "rooms": 540,
+      "quality": "ultra",
+      "mode": "cutaway",
+      "view": "interior",
+      "detail": "FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 991,
+      "seconds": 20.02,
+      "averageFPS": 49.5,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "CRAFT_2K",
+        "CLOSE_2K",
+        "OVERVIEW"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.9,
+      "frameP99ms": 21,
+      "maxFrameMs": 80.2,
+      "framesOver50ms": 4,
+      "meanSubmissionMs": 1.23,
+      "maxDrawCalls": 556,
+      "maxTriangles": 11385492,
+      "resources": {
+        "geometries": 117,
+        "textures": 39,
+        "jsHeapMB": 54.2
+      },
+      "contextLosses": 0,
+      "rapidInteraction": null,
+      "smoothnessPass": null
+    }
+  ],
+  "finalResources": {
+    "geometries": 117,
+    "textures": 39,
+    "jsHeapMB": 54.2
+  },
+  "roomSwitches": 24,
+  "growthRebuilds": 4,
+  "smoothnessPass": true,
+  "contextLosses": 0,
+  "limits": "Short browser test only. Render frame scheduling is not input-to-photon latency. JS heap is not total process or GPU memory. Rebuilding models is measured separately from orbit/zoom. No structural strength analysis."
+}

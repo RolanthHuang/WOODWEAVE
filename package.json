@@ -1,8 +1,11 @@
 {
   "name": "woodweave-habitat",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "type": "module",
   "private": true,
-  "description": "Nine-storey timber habitat with 1080 unique wool-felt interiors and full-detail viewing",
-  "scripts": {"build": "node build-standalone.mjs", "test": "node verify.mjs"}
+  "description": "Nine-storey timber habitat with 540 active rooms, 1080 seeded room designs and crafted close-view materials",
+  "scripts": {
+    "build": "node build-standalone.mjs",
+    "test": "node verify.mjs"
+  }
 }

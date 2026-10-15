@@ -1,0 +1,24 @@
+{
+  "edition": "ATELIER_05_CRAFT",
+  "simulation": "Local standalone copy: replace the two DPR inputs with 2; fix html/body, header, main and 3D viewport dimensions with CSS. This prevents host resizing and responsive media queries from changing the measured 1616x1004 client viewport (1617px outer width includes a 1px border). Production remains responsive with native DPR capped at 2. Geometry, materials, camera and benchmark code are unchanged. Every sampled render size is recorded.",
+  "originalSha256": "93d1ad6cd33f249803fd7ca7576082bd98bc0b191e5d1bbb744adb5b14d25350",
+  "testSha256": "dc20186b31c13f570d201ea0ba786abe6a93f590d65f231090cbeefa5332d560",
+  "replacementCount": 2,
+  "fixedLayout": [
+    1920,
+    1080
+  ],
+  "sources": {
+    "dist/app.js": "bf697e4358739fe22fee1a058f08945501341356ccbd947c5a3a8cec5c4521e5",
+    "dist/craft.js": "5cc1680175b4ebae6bbc39304e63f6ae9ef038b8d525f987b0697b9e06edc1d1",
+    "dist/model.js": "5359615ec5624ebce6dc3f046d576865a0b185557ffd437c7137679aacdda513",
+    "dist/furnishings.js": "28e912b837d203563c1ee69aef415f3ff0ab2ef3e142d8f82c469117254d05f6",
+    "dist/layout.js": "0606a3dc440549e8a100b301cb0adf32e214c3eb83997dd352ed75569b254f72",
+    "dist/surfaces.js": "e20a0f58cb281694910f81c0b6f2208c71b4f7c7c809c15c0a75bf93cb5dc33a",
+    "dist/style.css": "7ea485a805e8658cc4182a3a77d84cf18ae00d3db8a57cc260846c88c29913c4",
+    "index.html": "93d1ad6cd33f249803fd7ca7576082bd98bc0b191e5d1bbb744adb5b14d25350"
+  },
+  "activeRoomLimit": 540,
+  "designLibrary": 1080,
+  "fixedCSS": "html,body{width:1920px!important;height:1080px!important;min-width:1920px!important;min-height:1080px!important}.header{height:76px!important}main{width:1920px!important;height:1004px!important}#viewport{position:absolute!important;width:1617px!important;height:1004px!important;left:303px!important;top:0!important;right:auto!important;bottom:auto!important}"
+}

@@ -1,12 +1,26 @@
 import * as T from './vendor/three.module.min.js';
-import {generateRooms,getStats,buildingRadius,getEnvelope,getHeroAnchor,LEVELS,LEVEL_HEIGHT,MAX_ROOMS} from './layout.js';
+import {generateRooms,getStats,buildingRadius,getEnvelope,getHeroAnchor,LEVELS,LEVEL_HEIGHT,ROOM_HEIGHT,MAX_ROOMS} from './layout.js';
 import {createMaterials,buildHabitat,buildLandscape,buildStructure,buildRoom,disposeModel,setModelDetail} from './model.js';
 import {createEnvironment} from './surfaces.js';
+import {createCraftMaterials,createRoomPlaque} from './craft.js';
 
 const $=id=>document.getElementById(id),canvas=$('scene'),viewport=$('viewport');
 const state={count:MAX_ROOMS,mode:'exterior',floor:-1,explode:0,night:false,spin:false,interior:false,selected:0,quality:'ultra'};
 let rooms=[],habitat,landscape,structure,interiorModel,radius=35,renderHandle=0,lastTime=0,toastTimer,rangeTimer;
 const scene=new T.Scene(),materials=createMaterials();
+const craftMaterials=createCraftMaterials(materials),closePalette={...craftMaterials,label:materials.label},roomCache=new Map();
+function getCraftRoom(room){
+  if(roomCache.has(room.key)){const cached=roomCache.get(room.key);roomCache.delete(room.key);roomCache.set(room.key,cached);return cached;}
+  const label=craftMaterials.label.clone();label.map=createRoomPlaque(room);
+  const model=buildRoom(room,{...craftMaterials,label});model.root.userData.ownedResources=[label.map,label];roomCache.set(room.key,model);
+  while(roomCache.size>8){const key=roomCache.keys().next().value,old=roomCache.get(key);roomCache.delete(key);disposeModel(old.root);}
+  return model;
+}
+function habitatSurfaces(close){
+  if(!habitat||habitat.root.userData.closeSurfaces===close)return;
+  habitat.root.userData.closeSurfaces=close;const palette=close?closePalette:materials;
+  habitat.root.traverse(o=>{const key=o.userData.materialKey;if(key&&palette[key])o.material=palette[key];});
+}
 let renderer;
 try{
   renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true,powerPreference:'default'});
@@ -127,8 +141,10 @@ function enterRoom(replace=false){
   document.body.classList.remove('detail-view');$('toggle-room-info').setAttribute('aria-label','收合房間資訊');$('toggle-room-info').setAttribute('aria-expanded','true');$('toggle-room-info').textContent='−';
   if(state.interior&&!replace)return;
   if(!state.interior){savedOrbit={theta:orbit.goalTheta,phi:orbit.goalPhi,distance:orbit.goalDistance,target:orbit.goalTarget.clone()};}
-  if(interiorModel){scene.remove(interiorModel.root);disposeModel(interiorModel.root);}
-  state.interior=true;state.spin=false;setButton($('rotate'),false);const room=rooms[state.selected];materials.wall.side=T.FrontSide;materials.wall.needsUpdate=true;interiorModel=buildRoom(room,materials);scene.add(interiorModel.root);
+  if(interiorModel)scene.remove(interiorModel.root);
+  state.interior=true;state.spin=false;setButton($('rotate'),false);const room=rooms[state.selected];interiorModel=getCraftRoom(room);scene.add(interiorModel.root);
+  for(const key of ['ceiling','structure','skin'])if(interiorModel.categories[key])interiorModel.categories[key].visible=true;
+  if(interiorModel.categories.roof)interiorModel.categories.roof.visible=room.faces===4;
   const roomViewScale=viewport.clientWidth<=600&&viewport.clientHeight<600?1.25:1;
   orbit.goalTarget.set(0,1.15,0);orbit.goalDistance=(room.faces===6?14.5:11.8)*roomViewScale;orbit.goalTheta=-(room.rotation+(room.faces===6?(room.seed%2)*Math.PI:0))+.32;orbit.goalPhi=.94;
   document.body.classList.add('interior');$('back').hidden=false;$('scene-label').textContent=`04 / ${room.code.replace('–','-')} · INTERIOR`;$('scene-description').textContent='獨立房間模型 · 移除頂蓋與玻璃以觀察內裝';$('view-status').textContent=`${room.faces} FACES / ${room.program.kind.toUpperCase()}`;
@@ -136,21 +152,23 @@ function enterRoom(replace=false){
 }
 function leaveRoom(restore=true){
   document.body.classList.remove('detail-view');$('toggle-room-info').setAttribute('aria-label','收合房間資訊');$('toggle-room-info').setAttribute('aria-expanded','true');$('toggle-room-info').textContent='−';
-  if(!state.interior)return;state.interior=false;materials.wall.side=T.DoubleSide;materials.wall.needsUpdate=true;
-  if(interiorModel){scene.remove(interiorModel.root);disposeModel(interiorModel.root);interiorModel=null;}
+  if(!state.interior)return;state.interior=false;
+  if(interiorModel){scene.remove(interiorModel.root);interiorModel=null;}
   document.body.classList.remove('interior');$('back').hidden=true;roomGlow.intensity=0;
   if(restore&&savedOrbit){orbit.goalTheta=savedOrbit.theta;orbit.goalPhi=savedOrbit.phi;orbit.goalDistance=savedOrbit.distance;orbit.goalTarget.copy(savedOrbit.target);}
   applyVisibility();updateSelection();resize();
 }
 function resetView(){if(state.interior)leaveRoom();state.floor=-1;orbit.goalTheta=.28;orbit.goalPhi=1.35;orbit.goalDistance=fitDistance();orbit.goalTarget.set(0,overviewHeight(),0);setViewActive('axon');applyVisibility();requestRender();}
 function setViewActive(key){setButton($('view-axon'),key==='axon');setButton($('view-top'),key==='top');setButton($('view-front'),key==='front');}
-function zoom(factor){orbit.goalDistance=T.MathUtils.clamp(orbit.goalDistance*factor,state.interior?4:8,state.interior?32:radius*6);requestRender();}
+function zoom(factor){orbit.goalDistance=T.MathUtils.clamp(orbit.goalDistance*factor,state.interior?2.1:8,state.interior?32:radius*6);requestRender();}
 function setNight(){
   state.night=!state.night;document.body.classList.toggle('night',state.night);setButton($('night'),state.night);
   hemi.intensity=state.night?1.0:1.55;hemi.color.set(state.night?'#a8bab2':'#faf5e7');sun.intensity=state.night?.5:2.7;sun.color.set(state.night?'#adbbb7':'#fff5df');fill.intensity=state.night?.55:.75;
   scene.fog.color.set(state.night?'#1e2926':'#efeee7');groundMat.color.set(state.night?'#52675e':'#e9e9de');renderer.toneMappingExposure=state.night?1.08:1.08;roomGlow.intensity=state.interior&&state.night?15:0;
-  for(const [name,strength] of [['wood',.22],['wall',.12],['timber',.08],['white',.1],['fabric',.10],['felt',.09],['woodfelt',.09]]){materials[name].emissive.set('#b88b52');materials[name].emissiveIntensity=state.night?strength:0;}
-  materials.light.color.set(state.night?'#ffcf82':'#ffe3ac');materials.screen.color.set(state.night?'#cce9db':'#ffffff');scene.environmentIntensity=state.night?.16:.42;
+  for(const palette of [materials,craftMaterials]){
+    for(const [name,strength] of [['wood',.22],['wall',.12],['timber',.08],['woodend',.08],['white',.1],['fabric',.10],['felt',.09],['cloth',.09],['woodfelt',.09]]){palette[name].emissive.set('#b88b52');palette[name].emissiveIntensity=state.night?strength:0;}
+    palette.light.color.set(state.night?'#ffcf82':'#ffe3ac');palette.screen.color.set(state.night?'#cce9db':'#ffffff');
+  }scene.environmentIntensity=state.night?.16:.42;
   $('night-label').textContent=state.night?'夜色':'日光';$('night-icon').innerHTML=state.night?'<use href="#i-moon"/>':'<use href="#i-sun"/>';shadowUpdate();
 }
 
@@ -165,8 +183,8 @@ $('prev-room').addEventListener('click',()=>selectRoom(state.selected-1));$('nex
 $('enter-room').addEventListener('click',()=>enterRoom(state.interior));$('back').addEventListener('click',()=>leaveRoom());
 function collapseRoomInfo(){document.body.classList.add('detail-view');$('toggle-room-info').setAttribute('aria-label','展開房間資訊');$('toggle-room-info').setAttribute('aria-expanded','false');$('toggle-room-info').textContent='＋';}
 $('toggle-room-info').addEventListener('click',()=>{if(document.body.classList.contains('detail-view')){document.body.classList.remove('detail-view');$('toggle-room-info').setAttribute('aria-label','收合房間資訊');$('toggle-room-info').setAttribute('aria-expanded','true');$('toggle-room-info').textContent='−';}else collapseRoomInfo();});
-$('focus-furniture').addEventListener('click',()=>{if(!state.interior)enterRoom();for(const category of ['ceiling','roof','structure'])if(interiorModel.categories[category])interiorModel.categories[category].visible=false;const room=rooms[state.selected];collapseRoomInfo();orbit.goalTarget.set(0,.77,0);orbit.goalDistance=6.1;orbit.goalTheta=-(room.rotation+(room.faces===6?(room.seed%2)*Math.PI:0))+.27;orbit.goalPhi=1.04;shadowUpdate();});
-$('focus-hero').addEventListener('click',()=>{if(!state.interior)enterRoom();for(const category of ['ceiling','roof','structure'])if(interiorModel.categories[category])interiorModel.categories[category].visible=false;collapseRoomInfo();const room=rooms[state.selected],anchor=getHeroAnchor({...room,center:[0,0],poly:room.local});orbit.goalTarget.set(anchor.x,.51+anchor.scale*.77,anchor.z);orbit.goalDistance=4.6;orbit.goalTheta=Math.atan2(-anchor.x,-anchor.z);orbit.goalPhi=.95;shadowUpdate();});
+$('focus-furniture').addEventListener('click',()=>{if(!state.interior)enterRoom();for(const category of ['ceiling','roof','structure'])if(interiorModel.categories[category])interiorModel.categories[category].visible=false;const room=rooms[state.selected];collapseRoomInfo();orbit.goalTarget.set(0,.77,0);orbit.goalDistance=4.9;orbit.goalTheta=-(room.rotation+(room.faces===6?(room.seed%2)*Math.PI:0))+.27;orbit.goalPhi=1.04;shadowUpdate();});
+$('focus-hero').addEventListener('click',()=>{if(!state.interior)enterRoom();for(const category of ['ceiling','roof','structure','skin'])if(interiorModel.categories[category])interiorModel.categories[category].visible=false;collapseRoomInfo();const room=rooms[state.selected],anchor=getHeroAnchor({...room,center:[0,0],poly:room.local});orbit.goalTarget.set(anchor.x,.51+anchor.scale*.77,anchor.z);orbit.goalDistance=3.2;orbit.goalTheta=Math.atan2(-anchor.x,-anchor.z);orbit.goalPhi=.95;shadowUpdate();});
 $('zoom-in').addEventListener('click',()=>zoom(.8));$('zoom-out').addEventListener('click',()=>zoom(1.25));$('reset').addEventListener('click',resetView);
 $('view-axon').addEventListener('click',()=>{orbit.goalTheta=.28;orbit.goalPhi=1.35;setViewActive('axon');requestRender();});
 $('view-front').addEventListener('click',()=>{orbit.goalTheta=0;orbit.goalPhi=1.55;setViewActive('front');requestRender();});
@@ -219,8 +237,11 @@ function updateInteriorWall(){
   const room=rooms[state.selected],i=room.faces===4?0:room.seed%room.local.length,a=room.local[i],b=room.local[(i+1)%room.local.length];
   const mx=(a[0]+b[0])*.5,mz=(a[1]+b[1])*.5;
   let nx=-(b[1]-a[1]),nz=b[0]-a[0];if(nx*(-mx)+nz*(-mz)<0){nx=-nx;nz=-nz;}
-  const show=(camera.position.x-mx)*nx+(camera.position.z-mz)*nz>=0;
-  for(const mesh of interiorModel.categories.skin.children)if(mesh.material!==materials.glass)mesh.visible=show;
+  // A tetrahedron's service wall tilts toward its apex. Its half-space includes
+  // a vertical component; treating it as a vertical wall blocks the near view.
+  const ny=room.faces===4?(nx*mx+nz*mz)/ROOM_HEIGHT:0;
+  const show=(camera.position.x-mx)*nx+(camera.position.z-mz)*nz+(camera.position.y-.46)*ny>=0;
+  for(const mesh of interiorModel.categories.skin.children)if(mesh.userData.materialKey!=='glass')mesh.visible=show;
 }
 function setQuality(value){
   state.quality=value;$('quality').value=value;
@@ -234,7 +255,9 @@ function updateDetail(){
   const micro=state.quality==='ultra'||state.quality==='auto'&&px>(autoBudget?85:62);
   if(habitat)habitat.layers.forEach(layer=>setModelDetail(layer,high,micro));
   if(interiorModel)setModelDetail(interiorModel,true,state.quality!=='eco');
+  habitatSurfaces(state.quality!=='eco'&&px>85);
   canvas.dataset.detail=state.interior?'ROOM_FULL':high?(micro?'FULL':'CURVED'):'DISTANT';
+  canvas.dataset.surfaces=state.interior?'CRAFT_2K':habitat?.root.userData.closeSurfaces?'CLOSE_2K':'OVERVIEW';canvas.dataset.roomCache=roomCache.size;
 }
 const memorySnapshot=()=>({geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,
   jsHeapMB:performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576*10)/10:null});
@@ -256,12 +279,13 @@ function measureFrame(time,submit){
   const elapsed=time-b.stageStart,warmup=stage.rapid?6000:3000,duration=stage.duration||20000;
   // Count all measured gaps, including the first rapid zoom and long stalls.
   if(elapsed>=warmup&&b.lastSample){
+    b.renderSizes.add(`${canvas.width} × ${canvas.height}`);b.surfaceModes.add(canvas.dataset.surfaces);
     b.samples.push(time-b.lastSample);b.submits.push(submit);b.calls=Math.max(b.calls,renderer.info.render.calls);b.triangles=Math.max(b.triangles,renderer.info.render.triangles);
     if(stage.rapid){
       if(b.motionStartTheta===null)b.motionStartTheta=orbit.theta;
       b.motionMin=Math.min(b.motionMin,orbit.distance);b.motionMax=Math.max(b.motionMax,orbit.distance);b.motionRadians=Math.abs(orbit.theta-b.motionStartTheta);
       const phase=Math.floor((elapsed-warmup)/800);
-      if(phase!==b.zoomPhase){b.zoomPhase=phase;zoom((phase%2===0?12:b.farDistance)/orbit.goalDistance);b.zoomToggles++;}
+      if(phase!==b.zoomPhase){b.zoomPhase=phase;zoom((phase%2===0?(state.interior?2.4:12):b.farDistance)/orbit.goalDistance);b.zoomToggles++;}
       orbit.goalPhi=1.16+Math.sin((elapsed-warmup)/1800)*.15;
     }
   }
@@ -269,14 +293,14 @@ function measureFrame(time,submit){
   if(stage.cycle&&elapsed-b.lastCycle>650){
     b.lastCycle=elapsed;
     if(b.cycles<24){selectRoom(state.selected+1);b.cycles++;b.roomSwitches++;}
-    else if(b.cycles<28){regenerate(b.cycles%2?MAX_ROOMS:720);b.cycles++;b.growthRebuilds++;state.mode='cutaway';state.spin=true;applyVisibility();}
+    else if(b.cycles<28){regenerate(b.cycles%2?MAX_ROOMS:Math.round(MAX_ROOMS/9)*6);b.cycles++;b.growthRebuilds++;state.mode='cutaway';state.spin=true;applyVisibility();}
   }
   if(time-(b.lastPaint||0)>450){$('test-summary').textContent=`${b.index+1} / ${b.stages.length} · ${stage.name} · ${Math.min(duration/1000,Math.floor(Math.max(0,elapsed-warmup)/1000))} / ${duration/1000} 秒`;b.lastPaint=time;}
   if(elapsed>=warmup+duration){
     const sum=b.samples.reduce((a,b)=>a+b,0),fps=1000*b.samples.length/sum,p99=percentile(b.samples,.99),slow=b.samples.filter(n=>n>50).length;
     b.results.push({name:stage.name,rooms:state.count,quality:state.quality,mode:state.interior?'interior':state.mode,view:stage.rapid?'rapid':stage.near?'near':stage.interior?'interior':'overview',detail:canvas.dataset.detail,
       viewport:{width:viewport.clientWidth,height:viewport.clientHeight,renderWidth:canvas.width,renderHeight:canvas.height,pixelRatio:renderer.getPixelRatio()},
-      samples:b.samples.length,seconds:+(sum/1000).toFixed(2),averageFPS:+fps.toFixed(1),
+      samples:b.samples.length,seconds:+(sum/1000).toFixed(2),averageFPS:+fps.toFixed(1),renderSizes:[...b.renderSizes],surfaceModes:[...b.surfaceModes],roomCacheEntries:roomCache.size,
       frameP95ms:+percentile(b.samples,.95).toFixed(2),frameP99ms:+p99.toFixed(2),maxFrameMs:+Math.max(...b.samples).toFixed(2),framesOver50ms:slow,
       meanSubmissionMs:+(b.submits.reduce((a,b)=>a+b,0)/b.submits.length).toFixed(2),maxDrawCalls:b.calls,maxTriangles:b.triangles,resources:memorySnapshot(),contextLosses,
       rapidInteraction:stage.rapid?{zoomToggles:b.zoomToggles,zoomIntervalMs:800,rotationRadians:+b.motionRadians.toFixed(2),rotationSpeedRadiansPerSecond:2.2,cameraDistance:[+b.motionMin.toFixed(2),+b.motionMax.toFixed(2)],fixedQuality:true}:null,
@@ -286,7 +310,7 @@ function measureFrame(time,submit){
   }
 }
 function startBenchmarkStage(){
-  const b=benchmark,stage=b.stages[b.index];b.stage=stage;b.stageStart=0;b.lastSample=0;b.lastCycle=0;b.cycles=0;b.samples=[];b.submits=[];b.calls=0;b.triangles=0;b.zoomPhase=-1;b.zoomToggles=0;b.motionStartTheta=null;b.motionMin=Infinity;b.motionMax=0;b.motionRadians=0;
+  const b=benchmark,stage=b.stages[b.index];b.stage=stage;b.stageStart=0;b.lastSample=0;b.lastCycle=0;b.cycles=0;b.samples=[];b.submits=[];b.renderSizes=new Set();b.surfaceModes=new Set();b.calls=0;b.triangles=0;b.zoomPhase=-1;b.zoomToggles=0;b.motionStartTheta=null;b.motionMin=Infinity;b.motionMax=0;b.motionRadians=0;
   if(state.interior)leaveRoom(false);state.explode=0;state.floor=-1;state.mode=stage.mode||'exterior';$('explode').value=0;$('explode-value').textContent='0%';paintRange($('explode'));
   const began=performance.now(),reuse=state.count===stage.count;if(!reuse)regenerate(stage.count);b.buildTimes.push({name:stage.name,reused:reuse,milliseconds:Math.round(performance.now()-began)});
   setQuality(stage.quality);resetView();state.mode=stage.mode||'exterior';applyVisibility();
@@ -294,13 +318,13 @@ function startBenchmarkStage(){
     const r=rooms.filter(r=>r.level===4).reduce((a,r)=>Math.hypot(...r.center)<Math.hypot(...a.center)?r:a);
     orbit.goalTarget.set(r.center[0],r.level*LEVEL_HEIGHT+1.5,r.center[1]);orbit.goalDistance=stage.near?24:fitDistance()*1.10;orbit.goalPhi=1.16;
   }
-  if(stage.interior){selectRoom(rooms.find(r=>r.faces===6&&r.program.kind==='work')?.id||0);enterRoom();$('focus-furniture').click();}
-  orbit.distance=orbit.goalDistance;orbit.phi=orbit.goalPhi;orbit.theta=orbit.goalTheta;orbit.target.copy(orbit.goalTarget);b.farDistance=fitDistance()*1.10;
+  if(stage.interior){selectRoom(stage.hero!==undefined?rooms.find(r=>r.hero.type===stage.hero).id:rooms.find(r=>r.faces===6&&r.program.kind===(stage.program||'work'))?.id||0);enterRoom();$(stage.hero!==undefined?'focus-hero':'focus-furniture').click();}
+  orbit.distance=orbit.goalDistance;orbit.phi=orbit.goalPhi;orbit.theta=orbit.goalTheta;orbit.target.copy(orbit.goalTarget);b.farDistance=state.interior?10:fitDistance()*1.10;
   state.spin=true;setButton($('rotate'),true);requestRender();
 }
 function finishBenchmark(reason=null){
   if(!benchmark)return;const b=benchmark;benchmark=null;state.spin=false;setButton($('rotate'),false);
-  const result={edition:'ATELIER_04_1080',status:reason?'STOPPED':'COMPLETED',reason,
+  const result={edition:'ATELIER_05_CRAFT',status:reason?'STOPPED':'COMPLETED',reason,
     viewport:{width:viewport.clientWidth,height:viewport.clientHeight,devicePixelRatio,renderWidth:canvas.width,renderHeight:canvas.height},
     criteria:{averageFPSMin:45,frameP99msMax:28,framesOver50msMax:0},
     initialResources:b.initialResources,buildTimes:b.buildTimes,results:b.results,finalResources:memorySnapshot(),roomSwitches:b.roomSwitches,growthRebuilds:b.growthRebuilds,
@@ -316,11 +340,14 @@ $('quality').addEventListener('change',e=>{if(benchmark)finishBenchmark('手動�
 $('run-test').addEventListener('click',()=>{
   if(benchmark)return;if(state.night)setNight();
   benchmark={index:0,results:[],buildTimes:[],roomSwitches:0,growthRebuilds:0,originalSelected:state.selected,originalQuality:state.quality,initialResources:memorySnapshot(),stages:[
-    {name:'1,080 間・極致全景',count:MAX_ROOMS,quality:'ultra'},
-    {name:'1,080 間・極致近景',count:MAX_ROOMS,quality:'ultra',near:true},
-    {name:'1,080 間・快速旋轉與縮放',count:MAX_ROOMS,quality:'ultra',rapid:true,duration:60000},
-    {name:'1,080 間・極致剖面',count:MAX_ROOMS,quality:'ultra',mode:'cutaway',duration:12000},
+    {name:`${MAX_ROOMS} 間・極致全景`,count:MAX_ROOMS,quality:'ultra'},
+    {name:`${MAX_ROOMS} 間・極致近景`,count:MAX_ROOMS,quality:'ultra',near:true,duration:60000},
+    {name:`${MAX_ROOMS} 間・快速旋轉與縮放`,count:MAX_ROOMS,quality:'ultra',rapid:true,duration:60000},
+    {name:`${MAX_ROOMS} 間・極致剖面`,count:MAX_ROOMS,quality:'ultra',mode:'cutaway',duration:12000},
     {name:'單房・材質近看',count:MAX_ROOMS,quality:'ultra',interior:true,duration:12000},
+    {name:'羊毛氈沙發與織物',count:MAX_ROOMS,quality:'ultra',interior:true,program:'living',duration:12000},
+    {name:'稜晶裝置與加工細節',count:MAX_ROOMS,quality:'ultra',interior:true,hero:2,duration:12000},
+    {name:'單房・快速旋轉與微距縮放',count:MAX_ROOMS,quality:'ultra',interior:true,program:'living',rapid:true,duration:30000},
     {name:'24 次換房與反覆增建',count:MAX_ROOMS,quality:'ultra',interior:true,cycle:true}
   ]};
   $('run-test').hidden=true;$('stop-test').hidden=false;$('test-results').hidden=true;startBenchmarkStage();
@@ -328,4 +355,12 @@ $('run-test').addEventListener('click',()=>{
 $('stop-test').addEventListener('click',()=>finishBenchmark('手動停止'));
 
 regenerate(MAX_ROOMS);setQuality('ultra');orbit.distance=orbit.goalDistance;orbit.target.copy(orbit.goalTarget);setViewActive('axon');resize();
+// Upload close textures and compile both distance palettes while the loader is
+// visible, so the first rapid zoom does not have to compile the normal-map path.
+for(const texture of craftMaterials._textures)renderer.initTexture(texture);
+habitatSurfaces(true);renderer.compile(scene,camera);habitatSurfaces(false);renderer.compile(scene,camera);
+for(const kind of ['living','sleep','work','library','dining','zen','lounge','studio']){
+  const room=rooms.find(r=>r.program.kind===kind);if(!room)continue;
+  const model=getCraftRoom(room);renderer.compile(model.root,camera,scene);
+}
 requestAnimationFrame(()=>{$('loader').classList.add('done');canvas.dataset.ready='true';setTimeout(()=>$('loader').hidden=true,550);});

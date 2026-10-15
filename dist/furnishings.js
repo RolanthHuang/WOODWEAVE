@@ -27,6 +27,27 @@ export function addFurniture(batch,room,detail=false){
   const sphere=(m,x,y,z,w,h,d,col,cat='furniture')=>batch.sphere(m,cat,at(x,y,z),[w*fit,h*fit,d*fit],col);
   const torus=(m,x,y,z,d,col,cat='micro')=>batch.instance('torus',m,cat,at(x,y,z),[d*fit,d*fit,d*fit],col,0,new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2));
   const wood=room.wood.color,accent=room.accent,light=['#e5dfce','#e8e3d6','#d3d7c9'][room.seed%3],ink='#47574e',brass='#a58e62';
+  const stitch=(a,b,col='#bdb6a5')=>batch.thread(at(...a),at(...b),col);
+  const piping=(x,y,z,w,d,angle=0)=>{
+    if(!detail)return;
+    const ca=Math.cos(angle),sa=Math.sin(angle),p=(u,v)=>at(x+u*ca-v*sa,y,z+u*sa+v*ca),r=Math.min(w,d)*.13,points=[];
+    for(let corner=0;corner<4;corner++)for(let k=0;k<=8;k++){
+      const a=-Math.PI/2+corner*Math.PI/2+k*Math.PI/16;
+      points.push([(corner===0||corner===1?1:-1)*(w*.5-r)+Math.cos(a)*r,(corner===0||corner===3?-1:1)*(d*.5-r)+Math.sin(a)*r]);
+    }
+    for(let k=0;k<points.length;k++){
+      const a=points[k],b=points[(k+1)%points.length];batch.cord('felt','atelier',p(...a),p(...b),.006*fit,light);
+      const q=[a[0]*.975,a[1]*.975],e=[q[0]+(b[0]-a[0])*.42,q[1]+(b[1]-a[1])*.42];batch.thread(p(...q),p(...e),'#a8a18e');
+    }
+  };
+  const joinery=(x,y,z,w,d)=>{
+    if(!detail)return;
+    for(const sign of [-1,1]){
+      soft('woodend',x+sign*(w*.5-.003),y,z,.008,.064,d*.82,wood,0,'atelier');
+      for(let j=0;j<5;j++)box('timber',x+sign*(w*.5+.002),y-.016+j*.009,z+(j%2?.013:-.013),.008,.004,d*.54,'#9d815c',0,'atelier');
+      for(const zz of [-d*.34,d*.34]){cyl('metal',x+sign*w*.38,y+.048,z+zz,.021,.002,.021,brass,'atelier');stitch([x+sign*w*.38-.006,y+.05,z+zz],[x+sign*w*.38+.006,y+.05,z+zz],ink);}
+    }
+  };
   const contact=(x,z,w,d)=>batch.instance('plane','contact','ambient',at(x,.009,z),[w*fit,d*fit,1],null,0,new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),-Math.PI/2));
   const book=(x,y,z,w=.21,d=.31,col=accent)=>{
     soft('fabric',x,y,z,w,.046,d,col,0,'micro');box('paper',x,y+.004,z,w*.94,.028,d*.94,null,0,'micro');
@@ -53,6 +74,7 @@ export function addFurniture(batch,room,detail=false){
     const ca=Math.cos(angle),sa=Math.sin(angle),p=(xx,zz)=>[x+xx*ca-zz*sa,z+xx*sa+zz*ca];
     const piece=(xx,y,zz,w,h,d,mat,col,cat='furniture')=>{const q=p(xx,zz);soft(mat,q[0],y,q[1],w,h,d,col,angle,cat);};
     piece(0,.43,0,.59,.15,.57,'felt',light);piece(0,.70,-.245,.60,.46,.115,'timber',wood);piece(0,.7,-.17,.48,.34,.08,'felt',light);
+    piping(x,.506,z,.53,.51,angle);
     for(const dx of [-.21,.21])for(const dz of [-.21,.21]){
       const q=p(dx,dz),f=p(dx*1.14,dz*1.14);beam('metal',[f[0],.045,f[1]],[q[0],.40,q[1]],.027,ink,'furniture');cyl('metal',f[0],.035,f[1],.04,.04,.04,brass,'micro');
     }
@@ -68,6 +90,8 @@ export function addFurniture(batch,room,detail=false){
       const xx=x-w*.5+.07+cw*(k+.5);soft('felt',xx,.43,z+.015,cw-.025,.26,.70,light);
       soft('felt',xx,.72,z-.215,cw-.028,.42,.16,light);
       box('felt',xx,.562,z+.34,cw*.90,.008,.012,'#c1bdac',0,'micro');
+      piping(xx,.560,z+.015,cw-.055,.64);
+      if(detail)for(let j=0;j<20;j++)stitch([xx-cw*.4+j*cw*.04,.75,z-.131],[xx-cw*.4+j*cw*.04+.010,.75,z-.131],light);
     }
     for(const sign of [-1,1]){
       soft('felt',x+sign*w*.5,.51,z,.16,.58,.84,light);
@@ -76,11 +100,17 @@ export function addFurniture(batch,room,detail=false){
       for(let k=0;k<3;k++)box('felt',x+sign*w*.32+(-.08+k*.08),.71,z+.004,.003,.20,.006,'#b8b19b',0,'micro');
     }
     // The casually folded throw has an actual hanging edge and fringe.
-    soft('felt',x-w*.28,.575,z+.17,.41,.033,.48,accent,0,'micro');soft('felt',x-w*.28,.40,z+.414,.41,.36,.027,accent,0,'micro');
+    if(!detail){soft('felt',x-w*.28,.575,z+.17,.41,.033,.48,accent,0,'micro');soft('felt',x-w*.28,.40,z+.414,.41,.36,.027,accent,0,'micro');}
+    else{
+      const surface=(u,v)=>{const yy=v<.72?.597:.597-(v-.72)/.28*.39;return [x-w*.28+(u-.5)*.43,yy+Math.sin(u*Math.PI*9+room.seed%7)*(.008+v*.013),z-.07+Math.min(v/.72,1)*.49+(v>.72?(v-.72)*.025:0)];};
+      for(let row=0;row<24;row++)for(let col=0;col<24;col++)batch.quad('cloth','atelier',at(...surface(col/24,row/24)),at(...surface((col+1)/24,row/24)),at(...surface((col+1)/24,(row+1)/24)),at(...surface(col/24,(row+1)/24)),accent);
+      for(let k=0;k<30;k++){const a=surface(k/30,1),b=[a[0]+.003,a[1]-.055,a[2]+.008];batch.cord('felt','atelier',at(...a),at(...b),.004*fit,light);}
+    }
     for(let k=0;k<8;k++)box('felt',x-w*.47+k*.052,.202,z+.425,.009,.063,.01,light,0,'micro');
   };
   const table=(x,y,z,w,d)=>{
     contact(x,z,w*1.3,d*1.5);soft('timber',x,y,z,w,.09,d,wood);
+    joinery(x,y,z,w,d);
     soft('metal',x,y-.06,z,w*.91,.025,d*.90,brass,0,'micro');
     for(const dx of [-w*.35,w*.35])for(const dz of [-d*.32,d*.32])beam('metal',[x+dx,y-.05,z+dz],[x+dx*1.04,.035,z+dz*1.04],.033,ink,'furniture');
   };
@@ -95,6 +125,15 @@ export function addFurniture(batch,room,detail=false){
   }else batch.instance('torus','felt','micro',at(0,.028,.10),[2.46*fit,2.23*fit,.22*fit],light,0,new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2));
 
   for(let k=0;k<44;k++){const x=-1.15+rand()*2.3,z=-.68+rand()*1.55;beam('felt',[x,.034,z],[x+(rand()-.5)*.025,.040+rand()*.008,z+(rand()-.5)*.025],.0025,light);}
+  if(detail){
+    const fibers=rng(room.seed+77391);
+    for(let k=0;k<2600;k++){
+      const x=(fibers()-.5)*2.45,z=.10+(fibers()-.5)*1.75;
+      if(rugShape===0&&x*x/(1.20*1.20)+(z-.1)*(z-.1)/(.99*.99)>1)continue;
+      const a=fibers()*Math.PI*2,len=.006+fibers()*.018;
+      stitch([x,.037,z],[x+Math.cos(a)*len,.04+fibers()*.012,z+Math.sin(a)*len],k%3?'#ddd5c0':'#a99d83');
+    }
+  }
 
   switch(room.program.kind){
     case 'sleep':{
@@ -105,6 +144,8 @@ export function addFurniture(batch,room,detail=false){
         box('fabric',x,.634,-.603,.58,.006,.008,'#c4bdad',0,'micro');
       }
       soft('fabric',0,.642,.65,1.69,.043,.42,accent);soft('fabric',0,.49,1.0,1.68,.30,.036,accent,0,'micro');
+      piping(0,.622,.18,1.59,1.30);piping(0,.669,.65,1.61,.36);
+      if(detail)for(let k=0;k<60;k++)stitch([-.73+k*.025,.648,-.602],[-.72+k*.025,.648,-.602],light);
       for(let k=0;k<9;k++)box('fabric',-.76+k*.19,.67,.65,.012,.005,.38,light,0,'micro');
       soft('timber',0,.77,-1.24,1.89,1.40,.13,wood);soft('fabric',0,.84,-1.14,1.72,.86,.10,light);
       for(const x of [-.55,0,.55])box('fabric',x,.84,-1.079,.008,.74,.007,'#bbb8a9',0,'micro');
@@ -134,6 +175,7 @@ export function addFurniture(batch,room,detail=false){
       // Open-front cabinetry, rather than a solid block of timber.
       box('timber',0,1.13,-1.10,2.05,2.16,.055,wood);
       for(const x of [-1.02,0,1.02])box('timber',x,1.13,-.94,.055,2.16,.36,wood);
+      if(detail)for(const x of [-1.02,0,1.02])for(let y=.24;y<2.1;y+=.064)stitch([x+.028,y,-.82],[x+.028,y+.012,-.82],brass);
       for(let row=0;row<5;row++){
         const y=.17+row*.45;box('timber',0,y,-.94,2.06,.055,.37,wood);box('light',0,y-.025,-.795,1.94,.014,.015);
         if(row<4)for(let j=0;j<9;j++){
@@ -159,6 +201,7 @@ export function addFurniture(batch,room,detail=false){
       contact(0,-.2,2.5,2.4);soft('timber',0,.12,-.25,2.13,.20,1.88,wood);
       for(let k=0;k<10;k++)box('timber',-.97+k*.215,.224,-.25,.006,.002,1.77,'#b4a27c',0,'micro');
       for(const x of [-.53,.53]){batch.instance('pouf','felt','furniture',at(x,.30,.13),[.72*fit,.16*fit,.72*fit],x<0?light:accent);torus('felt',x,.30,.13,.69,light);}
+      piping(-.53,.373,.13,.59,.59);piping(.53,.373,.13,.59,.59);
       table(0,.43,-.49,.94,.54);soft('stone',0,.49,-.49,.64,.025,.36,'#aeb7a1');
       sphere('ceramic',0,.59,-.53,.18,.16,.18,accent,'micro');cyl('timber',0,.69,-.53,.06,.025,.06,wood,'micro');
       beam('ceramic',[.055,.60,-.53],[.15,.65,-.53],.035,accent);

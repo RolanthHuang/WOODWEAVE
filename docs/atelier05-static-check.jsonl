@@ -1,0 +1,9 @@
+{"n":36,"total":36,"four":3,"five":26,"six":7,"levels":9,"perFloor":[1,2,4,7,9,6,4,2,1],"radius":25.483}
+{"n":72,"total":72,"four":9,"five":46,"six":17,"levels":9,"perFloor":[2,4,8,13,17,13,8,5,2],"radius":27.075528162969537}
+{"n":180,"total":180,"four":25,"five":117,"six":38,"levels":9,"perFloor":[4,10,20,32,44,32,20,12,6],"radius":39.63369192211214}
+{"n":216,"total":216,"four":27,"five":149,"six":40,"levels":9,"perFloor":[5,12,24,39,53,38,24,14,7],"radius":42.400000000000006}
+{"n":360,"total":360,"four":60,"five":241,"six":59,"levels":9,"perFloor":[8,20,40,64,88,64,40,24,12],"radius":52.3189403857328}
+{"n":540,"total":540,"four":95,"five":366,"six":79,"levels":9,"perFloor":[12,30,60,96,132,96,60,36,18],"radius":61.6}
+{"n":720,"total":720,"four":122,"five":495,"six":103,"levels":9,"perFloor":[16,40,80,128,176,128,80,48,24],"radius":68}
+{"n":1080,"total":1080,"four":184,"five":737,"six":159,"levels":9,"perFloor":[24,60,120,192,264,192,120,72,36],"radius":84.19177015130667}
+{"nineFloors":"PASS","diamondRoomDistribution":"PASS","twoSideColumns":"PASS","activeRooms":540,"designLibrary":1080,"uniqueHeroPerRoom":"PASS","uniqueFurnitureGeometry":1080,"distinctPhysicalPlaques":540,"strengthAnalysis":"NOT_ANALYSED","stableExtension":"PASS","geometry":"PASS","allThreeRoomTypes":"PASS","selfContained":"PASS","drawBatches":660,"instances":165992,"triangles":12307789,"craft":{"edition":5,"roomsChecked":1080,"maxTriangles":207848,"lineSegments":[2494,3224],"finiteCoordinates":"PASS"}}

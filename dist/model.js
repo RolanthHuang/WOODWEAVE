@@ -6,7 +6,7 @@ import {addPlant,addFurniture} from './furnishings.js';
 const Y=new T.Vector3(0,1,0),tmp=new T.Object3D();
 function roundedBox(segments){
   const g=new T.BoxGeometry(1,1,1,segments,segments,segments),p=g.attributes.position,n=g.attributes.normal;
-  const grid=segments===5?[-.5,-.477,-.437,.437,.477,.5]:[-.5,-.437,.437,.5],v=new T.Vector3(),inner=new T.Vector3();
+  const grid=segments===9?[-.5,-.497,-.483,-.454,-.40,.40,.454,.483,.497,.5]:segments===5?[-.5,-.477,-.437,.437,.477,.5]:[-.5,-.437,.437,.5],v=new T.Vector3(),inner=new T.Vector3();
   for(let i=0;i<p.count;i++){
     v.fromBufferAttribute(p,i);v.set(...[v.x,v.y,v.z].map(x=>grid[Math.round((x+.5)*segments)]));
     inner.set(T.MathUtils.clamp(v.x,-.40,.40),T.MathUtils.clamp(v.y,-.40,.40),T.MathUtils.clamp(v.z,-.40,.40));
@@ -25,13 +25,15 @@ function leafGeometry(){
 }
 const lathe=(profile,segments=24)=>new T.LatheGeometry(profile.map(([r,y])=>new T.Vector2(r,y)),segments);
 const BOX=new T.BoxGeometry(1,1,1),CYLINDER=new T.CylinderGeometry(.5,.5,1,24),SPHERE=new T.SphereGeometry(.5,24,14),CONE=new T.ConeGeometry(.5,1,7),TORUS=new T.TorusGeometry(.5,.018,8,48);
-const GEOMETRIES={box:BOX,cylinder:CYLINDER,sphere:SPHERE,cone:CONE,torus:TORUS,rounded:roundedBox(5),leaf:leafGeometry(),plane:new T.PlaneGeometry(1,1),
+const GEOMETRIES={box:BOX,cylinder:CYLINDER,cord:new T.CylinderGeometry(.5,.5,1,6),sphere:SPHERE,cone:CONE,torus:TORUS,rounded:roundedBox(5),leaf:leafGeometry(),plane:new T.PlaneGeometry(1,1),
   pot:lathe([[0,-.5],[.32,-.5],[.38,-.46],[.49,.40],[.50,.48],[.46,.50],[.44,.43],[.38,-.37],[0,-.37]]),
   vase:lathe([[0,-.5],[.27,-.5],[.43,-.4],[.5,-.1],[.46,.13],[.22,.33],[.19,.48],[.17,.5],[.14,.48],[.15,.30],[.39,.05],[.4,-.25],[.24,-.41],[0,-.41]]),
   pouf:lathe([[0,-.5],[.36,-.5],[.45,-.40],[.49,-.18],[.50,.13],[.47,.35],[.40,.47],[.28,.5],[0,.5]]),
   cup:lathe([[0,-.5],[.32,-.5],[.43,-.44],[.5,.43],[.49,.5],[.43,.5],[.40,.36],[.34,-.32],[0,-.32]],20)};
 const LOW_GEOMETRIES={rounded:roundedBox(3),cylinder:new T.CylinderGeometry(.5,.5,1,12),sphere:new T.IcosahedronGeometry(.5,1),torus:new T.TorusGeometry(.5,.018,6,24)};
-const SHARED_GEOMETRIES=new Set([...Object.values(GEOMETRIES),...Object.values(LOW_GEOMETRIES)]);
+const CRAFT_GEOMETRIES={...GEOMETRIES,rounded:roundedBox(9),cylinder:new T.CylinderGeometry(.5,.5,1,64),sphere:new T.SphereGeometry(.5,48,32),torus:new T.TorusGeometry(.5,.018,12,96)};
+for(const key of ['pot','vase','pouf','cup'])CRAFT_GEOMETRIES[key]=new T.LatheGeometry(GEOMETRIES[key].parameters.points,64);
+const SHARED_GEOMETRIES=new Set([...Object.values(GEOMETRIES),...Object.values(LOW_GEOMETRIES),...Object.values(CRAFT_GEOMETRIES)]);
 const c=new T.Color();
 
 export function createMaterials(){
@@ -45,6 +47,7 @@ export function createMaterials(){
     ceramic:std('#ffffff',{roughness:.26,metalness:.04}),paper:std('#eee8d7',{roughness:.96}),
     fabric:std('#ffffff',{map:tex.textile,bumpMap:tex.textileHeight,bumpScale:.011,roughness:.94}),
     felt:new T.MeshPhysicalMaterial({color:'#ffffff',map:tex.wool,bumpMap:tex.woolHeight,bumpScale:.028,roughness:.98,sheen:.72,sheenColor:new T.Color('#e6dfca'),sheenRoughness:.93}),
+    cloth:new T.MeshPhysicalMaterial({color:'#ffffff',map:tex.wool,vertexColors:true,side:T.DoubleSide,roughness:.98,sheen:.72,sheenColor:new T.Color('#e6dfca'),sheenRoughness:.93}),
     woodfelt:std('#ffffff',{map:tex.woodfelt,bumpMap:tex.woodfeltHeight,bumpScale:.035,roughness:1}),
     glass:std('#acc4bd',{transparent:true,opacity:.13,roughness:.12,metalness:.3,depthWrite:false,side:T.DoubleSide}),
     roofglass:std('#c5d6c8',{transparent:true,opacity:.21,metalness:.2,roughness:.16,side:T.DoubleSide,depthWrite:false}),
@@ -53,12 +56,18 @@ export function createMaterials(){
     screen:new T.MeshBasicMaterial({map:tex.screen,color:'#ffffff',toneMapped:false}),
     label:new T.MeshBasicMaterial({map:tex.label,color:'#ffffff',toneMapped:false,side:T.DoubleSide}),
     contact:new T.MeshBasicMaterial({map:tex.contact,transparent:true,depthWrite:false,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-1}),
-    cyan:new T.MeshBasicMaterial({color:'#abc6b3',toneMapped:false})
+    cyan:new T.MeshBasicMaterial({color:'#abc6b3',toneMapped:false}),
+    woodend:std('#ffffff',oak),crystal:new T.MeshPhysicalMaterial({color:'#ffffff',roughness:.19,metalness:.12,clearcoat:.8,clearcoatRoughness:.16}),
+    thread:new T.LineBasicMaterial({color:'#ffffff',vertexColors:true,transparent:true,opacity:.78})
   };
 }
 
 class Batch {
-  constructor(materials){this.materials=materials;this.instances=new Map();this.surfaces=new Map();}
+  constructor(materials,detail=false){this.materials=materials;this.detail=detail;this.instances=new Map();this.surfaces=new Map();this.threads=new Map();}
+  thread(a,b,color='#c6bdab',category='atelier'){
+    if(!this.threads.has(category))this.threads.set(category,{p:[],colors:[]});
+    const group=this.threads.get(category);group.p.push(...a,...b);c.set(color);group.colors.push(c.r,c.g,c.b,c.r,c.g,c.b);
+  }
   instance(geometry,material,category,pos,scale,color,rotation=0,quaternion=null){
     const key=`${geometry}:${material}:${category}`;
     if(!this.instances.has(key))this.instances.set(key,{geometry,material,category,items:[]});
@@ -67,6 +76,7 @@ class Batch {
   }
   box(material,category,pos,scale,color,rotation=0){this.instance('box',material,category,pos,scale,color,rotation);}
   beam(material,category,a,b,width,color,depth=width){const va=new T.Vector3(...a),vb=new T.Vector3(...b),dir=vb.clone().sub(va);this.instance('box',material,category,va.add(vb).multiplyScalar(.5).toArray(),[width,dir.length(),depth],color,0,new T.Quaternion().setFromUnitVectors(Y,dir.normalize()));}
+  cord(material,category,a,b,width,color){const va=new T.Vector3(...a),vb=new T.Vector3(...b),dir=vb.clone().sub(va);this.instance('cord',material,category,va.add(vb).multiplyScalar(.5).toArray(),[width,dir.length(),width],color,0,new T.Quaternion().setFromUnitVectors(Y,dir.normalize()));}
   cylinder(material,category,pos,scale,color,rotation=0){this.instance('cylinder',material,category,pos,scale,color,rotation);}
   sphere(material,category,pos,scale,color){this.instance('sphere',material,category,pos,scale,color);}
   tri(material,category,a,b,d,color,room=-1){
@@ -77,7 +87,7 @@ class Batch {
     const cs=Math.cos(rotation),sn=Math.sin(rotation),p=(x,y)=>[pos[0]+x*cs,pos[1]+y,pos[2]-x*sn];
     this.quad('label','micro',p(-scale[0]/2,-scale[1]/2),p(scale[0]/2,-scale[1]/2),p(scale[0]/2,scale[1]/2),p(-scale[0]/2,scale[1]/2),'#ffffff');
     const b=this.surfaces.get('label:micro'),u=(id%LABEL_COLUMNS)/LABEL_COLUMNS,v=1-(Math.floor(id/LABEL_COLUMNS)+1)/LABEL_ROWS,du=1/LABEL_COLUMNS,dv=1/LABEL_ROWS;
-    b.uv.splice(b.uv.length-12,12,u,v,u+du,v,u+du,v+dv,u,v,u+du,v+dv,u,v+dv);
+    b.uv.splice(b.uv.length-12,12,...(this.materials.label.userData.singlePlaque?[0,0,1,0,1,1,0,0,1,1,0,1]:[u,v,u+du,v,u+du,v+dv,u,v,u+du,v+dv,u,v+dv]));
   }
   quad(material,category,a,b,d,e,color,room=-1){this.tri(material,category,a,b,d,color,room);this.tri(material,category,a,d,e,color,room);}
   polygon(material,category,poly,y,color,room=-1){const center=poly.reduce((a,p)=>[a[0]+p[0]/poly.length,y,a[2]+p[1]/poly.length],[0,y,0]);for(let i=0;i<poly.length;i++){let a=poly[i],b=poly[(i+1)%poly.length];this.tri(material,category,[b[0],y,b[1]],[a[0],y,a[1]],center,color,room);}}
@@ -85,17 +95,31 @@ class Batch {
     const root=new T.Group(),categories={};const pickables=[];
     const group=key=>categories[key]||(categories[key]=new T.Group());
     for(const b of this.instances.values()){
-      const geometry=GEOMETRIES[b.geometry];
+      const geometry=(this.detail?CRAFT_GEOMETRIES:GEOMETRIES)[b.geometry];
       const mesh=new T.InstancedMesh(geometry,this.materials[b.material],b.items.length);
       b.items.forEach((o,i)=>{mesh.setMatrixAt(i,o.matrix);mesh.setColorAt(i,c.set(o.color));});
       mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;
-      mesh.userData.highGeometry=geometry;mesh.userData.lowGeometry=LOW_GEOMETRIES[b.geometry]||geometry;
+      mesh.userData.materialKey=b.material;mesh.userData.highGeometry=geometry;mesh.userData.lowGeometry=LOW_GEOMETRIES[b.geometry]||geometry;
       mesh.castShadow=!['light','screen','label','contact','glass','roofglass'].includes(b.material)&&b.category!=='micro';mesh.receiveShadow=b.category!=='micro'&&b.material!=='contact';mesh.computeBoundingSphere();group(b.category).add(mesh);
     }
     for(const b of this.surfaces.values()){
       const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(b.p,3));geo.setAttribute('uv',new T.Float32BufferAttribute(b.uv,2));geo.setAttribute('color',new T.Float32BufferAttribute(b.colors,3));geo.computeVertexNormals();
+      if(b.material==='cloth'){
+        // Batch triangles share positions, not indices. Average the cloth normals
+        // across those positions so a draped throw does not look like sheet metal.
+        const sums=new Map(),p=geo.attributes.position,n=geo.attributes.normal,keys=[];
+        for(let i=0;i<p.count;i++){
+          const key=`${p.getX(i).toFixed(5)},${p.getY(i).toFixed(5)},${p.getZ(i).toFixed(5)}`;keys.push(key);
+          if(!sums.has(key))sums.set(key,new T.Vector3());sums.get(key).add(new T.Vector3().fromBufferAttribute(n,i));
+        }
+        for(let i=0;i<p.count;i++){const normal=sums.get(keys[i]).clone().normalize();n.setXYZ(i,normal.x,normal.y,normal.z);}
+      }
       const mesh=new T.Mesh(geo,this.materials[b.material]);mesh.castShadow=!['glass','roofglass','label','contact','light'].includes(b.material)&&b.category!=='micro';mesh.receiveShadow=b.material!=='label';mesh.userData.rooms=b.rooms;
-      group(b.category).add(mesh);if(b.rooms.some(n=>n>=0))pickables.push(mesh);
+      mesh.userData.materialKey=b.material;group(b.category).add(mesh);if(b.rooms.some(n=>n>=0))pickables.push(mesh);
+    }
+    for(const [category,b] of this.threads){
+      const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(b.p,3));g.setAttribute('color',new T.Float32BufferAttribute(b.colors,3));
+      group(category).add(new T.LineSegments(g,this.materials.thread));
     }
     for(const [name,g] of Object.entries(categories)){g.name=name;root.add(g);}
     return {root,categories,pickables};
@@ -110,7 +134,7 @@ function addHero(batch,room,detail=false){
   const ax=anchor.x,az=anchor.z;
   const normal=new T.Vector2(room.center[0]-ax,room.center[1]-az).normalize(),right=[normal.y,-normal.x],rotation=Math.atan2(normal.x,normal.y),base=.51;
   const at=(x,y,z)=>[ax+(x*right[0]+z*normal.x)*s,base+y*s,az+(x*right[1]+z*normal.y)*s];
-  const box=(mat,x,y,z,w,h,d,color,angle=0)=>batch.box(mat,'furniture',at(x,y,z),[w*s,h*s,d*s],color,rotation+angle);
+  const box=(mat,x,y,z,w,h,d,color,angle=0)=>batch.instance(detail&&['felt','woodfelt','timber','white','fabric','stone'].includes(mat)?'rounded':'box',mat,'furniture',at(x,y,z),[w*s,h*s,d*s],color,rotation+angle);
   const sphere=(mat,x,y,z,d,color)=>batch.sphere(mat,'furniture',at(x,y,z),[d*s,d*s,d*s],color);
   const beam=(mat,a,b,width,color)=>batch.beam(mat,'furniture',at(...a),at(...b),width*s,color);
   const ring=(mat,x,y,z,diameter,tilt,color)=>batch.instance('torus',mat,'furniture',at(x,y,z),[diameter*s,diameter*s,diameter*s],color,0,new T.Quaternion().setFromEuler(new T.Euler(tilt[0],tilt[1],tilt[2])));
@@ -131,7 +155,7 @@ function addHero(batch,room,detail=false){
       box('timber',0,.85,-.12,1.22,1.20,.11,wood);
       for(let y=0;y<5;y++)for(let x=0;x<6;x++){
         const encoded=y===0?((hero.variant>>x)&1):null,depth=encoded===null?.04+rand()*.22:.05+encoded*.18;
-        box((x+y)%7===0?'light':'fabric',-.48+x*.19,.40+y*.20,-.04+depth*.5,.15,.16,depth,(x+y)%3?accent:'#e4dfcd');
+        box((x+y)%7===0?'light':detail?'felt':'fabric',-.48+x*.19,.40+y*.20,-.04+depth*.5,.15,.16,depth,(x+y)%3?accent:'#e4dfcd');
       }break;
     case 1:
       beam('metal',[0,.2,0],[0,1.22,0],.035);
@@ -139,7 +163,7 @@ function addHero(batch,room,detail=false){
       sphere('fabric',0,.85,0,.17,accent);break;
     case 2:{
       const count=3+hero.variant%4;
-      for(let k=0;k<count;k++){const angle=k*2.4+rand()*.6,radius=k===0?0:.18+rand()*.16,h=.44+rand()*.8;batch.instance('cone','fabric','furniture',at(Math.cos(angle)*radius,.20+h*.5,Math.sin(angle)*radius),[.24*s,h*s,.24*s],k%2?accent:'#d5d8ca',rotation+angle);}
+      for(let k=0;k<count;k++){const angle=k*2.4+rand()*.6,radius=k===0?0:.18+rand()*.16,h=.44+rand()*.8;batch.instance('cone',detail?'crystal':'fabric','furniture',at(Math.cos(angle)*radius,.20+h*.5,Math.sin(angle)*radius),[.24*s,h*s,.24*s],k%2?accent:'#d5d8ca',rotation+angle);}
       box('light',0,.19,0,.95,.025,.58);break;}
     case 3:{
       const count=9+hero.variant%5,phase=rand()*6.28,frequency=1.0+rand()*2.1;
@@ -174,6 +198,49 @@ function addHero(batch,room,detail=false){
     batch.beam('metal','micro',at(x,.23,-.055),at(x,1.39,-.055),.012*s,'#aa9469');
   }
   if(hero.type===2)for(let k=0;k<16;k++){const a=k*2.4,r=.1+rand()*.36;batch.sphere('stone','micro',at(Math.cos(a)*r,.22,Math.sin(a)*r),[.055*s,.035*s,.055*s],'#d6d1bc');}
+  if(detail){
+    const fine=rng(hero.seed+97071),thread=(a,b,col)=>batch.thread(at(...a),at(...b),col);
+    // A seeded carved contour is real geometry, not just a different plaque.
+    for(let band=0;band<3;band++)for(let k=0;k<80;k++){
+      const point=t=>{const a=t*Math.PI*2/80,r=.34+band*.053+Math.sin(a*(3+hero.variant%5)+hero.variant)*.015;return [Math.cos(a)*r,.187,Math.sin(a)*r*.57];};
+      thread(point(k),point(k+.72),band%2?'#eee1bc':'#8d7858');
+    }
+    for(const x of [-.5,.5])for(const z of [-.27,.27]){
+      batch.instance('torus','metal','atelier',at(x,.192,z),[.033*s,.033*s,.033*s],'#8e7a54',0,new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2));
+      thread([x-.008,.196,z],[x+.008,.196,z],'#4e5748');
+    }
+    // Separate detailing languages for all nine families: brass pin maps,
+    // laminated fins, machined collars, etched constellation and cabinet joints.
+    if(hero.type===0||hero.type===7){
+      box('woodfelt',0,.85,-.178,1.12,1.10,.018,'#b5a17e');
+      for(let k=0;k<48;k++){
+        const x=-.51+(k%8)*.145,y=.36+Math.floor(k/8)*.186;
+        batch.cylinder('metal','atelier',at(x,y,-.035),[.013*s,.013*s,.013*s],'#bfa97c');
+        if(hero.type===7&&k%3===hero.variant%3)thread([x,y,.006],[x+.04+fine()*.05,y+.04,.006],'#c4b17c');
+      }
+    }else if(hero.type===1||hero.type===4){
+      for(let k=0;k<12;k++){const a=k*Math.PI/6;thread([Math.cos(a)*.12,.23,Math.sin(a)*.12],[Math.cos(a)*.15,.23,Math.sin(a)*.15],'#4b6255');}
+      for(let k=0;k<6;k++)batch.cylinder('metal','atelier',at(0,.27+k*.16,0),[.055*s,.014*s,.055*s],'#bda475');
+    }else if(hero.type===3){
+      const fin=rng(hero.seed),count=9+hero.variant%5,phase=fin()*6.28,frequency=1+fin()*2.1;
+      for(let k=0;k<count;k++){
+        const x=-.47+k*.94/(count-1),h=.46+.58*(.5+.5*Math.sin(k/(count-1)*Math.PI*frequency+phase)),z=Math.sin(k*.6+phase)*.12;
+        box('woodend',x,.20+h+.001,z,.047,.003,.185,wood);
+        for(let j=0;j<4;j++)thread([x-.017,.25+j*.038,z+.096],[x+.017,.25+j*.038,z+.096],'#ac8c5c');
+      }
+    }else if(hero.type===8){
+      const shelf=rng(hero.seed);
+      for(let k=0;k<4;k++){
+        const a=(shelf()-.5)*.7,x=(shelf()-.5)*.28,y=.29+k*.27,w=.60+shelf()*.35;shelf();
+        for(const sign of [-1,1])for(let j=0;j<4;j++)box('woodend',x+sign*w*.43,y+.023,-.16+j*.085,.018,.014,.026,wood,a);
+      }
+    }else{
+      for(let k=0;k<18;k++){
+        const a=k*2.4,r=.18+fine()*.25;
+        batch.sphere('crystal','atelier',at(Math.cos(a)*r,.205,Math.sin(a)*r*.6),[.014*s,.012*s,.014*s],k%3?accent:'#d4c199');
+      }
+    }
+  }
 }
 
 function addRoom(batch,room,detail=false){
@@ -233,6 +300,22 @@ function addRoom(batch,room,detail=false){
   }
   addFurniture(batch,room,detail);
   addHero(batch,room,detail);
+  if(detail){
+    // Individually clipped board seams, following this room's polygon.
+    const minZ=Math.min(...points.map(p=>p[1])),maxZ=Math.max(...points.map(p=>p[1]));
+    for(let z=minZ+.18;z<maxZ;z+=.23){
+      const xs=[];for(let i=0;i<points.length;i++){const a=points[i],b=points[(i+1)%points.length];if((a[1]<=z&&b[1]>z)||(b[1]<=z&&a[1]>z))xs.push(a[0]+(z-a[1])/(b[1]-a[1])*(b[0]-a[0]));}
+      xs.sort((a,b)=>a-b);if(xs.length<2)continue;
+      batch.thread([xs[0]+.025,floor+.004,z],[xs[1]-.025,floor+.004,z],'#ac916c','floor');
+      batch.thread([xs[0]+.025,floor+.005,z+.006],[xs[1]-.025,floor+.005,z+.006],'#e9d5af','floor');
+      const offset=(Math.round((z-minZ)/.23)%3)*.53;
+      for(let x=xs[0]+.28+offset;x<xs[1]-.03;x+=1.65){
+        const zs=[];for(let i=0;i<points.length;i++){const a=points[i],b=points[(i+1)%points.length];if((a[0]<=x&&b[0]>x)||(b[0]<=x&&a[0]>x))zs.push(a[1]+(x-a[0])/(b[0]-a[0])*(b[1]-a[1]));}
+        const from=Math.max(z-.205,Math.min(...zs)+.015),to=Math.min(z-.005,Math.max(...zs)-.015);
+        if(from<to)batch.thread([x,floor+.005,from],[x,floor+.005,to],'#b19a79','floor');
+      }
+    }
+  }
   // Some modules host a small roof garden; each is fixed to its own seed.
   if(faces!==4&&seed%6===0){
     const p=points[0],x=center[0]+(p[0]-center[0])*.44,z=center[1]+(p[1]-center[1])*.44;
@@ -244,14 +327,30 @@ function addRoom(batch,room,detail=false){
 export function buildHabitat(rooms,materials){
   const layers=[],pickables=[],root=new T.Group();
   for(let l=0;l<LEVELS;l++){
-    const batch=new Batch(materials);rooms.filter(r=>r.level===l).forEach(r=>addRoom(batch,r));
-    const layer=batch.finish();layer.root.position.y=l*LEVEL_HEIGHT;root.add(layer.root);layers.push(layer);pickables.push(...layer.pickables);
+    // Small scenes benefit more from fewer draw calls than from spatial culling.
+    // Keep the spatial path for larger generated design-library scenes.
+    const tiles=new Map(),tileSize=SIDE*7.5;
+    for(const room of rooms.filter(r=>r.level===l)){
+      const key=rooms.length<=720?'floor':`${Math.floor(room.center[0]/tileSize)}:${Math.floor(room.center[1]/tileSize)}`;
+      if(!tiles.has(key))tiles.set(key,[]);tiles.get(key).push(room);
+    }
+    const layer={root:new T.Group(),categories:{},pickables:[],tiles:tiles.size};
+    for(const tile of tiles.values()){
+      const batch=new Batch(materials);tile.forEach(r=>addRoom(batch,r));const part=batch.finish();
+      for(const [name,group] of Object.entries(part.categories)){
+        if(!layer.categories[name]){const g=new T.Group();g.name=name;layer.categories[name]=g;layer.root.add(g);}
+        for(const mesh of [...group.children])layer.categories[name].add(mesh);
+      }
+      layer.pickables.push(...part.pickables);
+    }
+    layer.root.position.y=l*LEVEL_HEIGHT;root.add(layer.root);layers.push(layer);pickables.push(...layer.pickables);
   }
   root.updateMatrixWorld(true);return {root,layers,pickables};
 }
 export function buildRoom(room,materials){
   const localRoom={...room,center:[0,0],poly:room.local.map(p=>p.slice())};
-  const batch=new Batch(materials);addRoom(batch,localRoom,true);const result=batch.finish();
+  const batch=new Batch(materials,true);addRoom(batch,localRoom,true);const result=batch.finish();
+  result.root.userData.craftEdition=5;
   if(result.categories.roof)result.categories.roof.visible=room.faces===4;
   if(result.categories.glazingframe)result.categories.glazingframe.visible=false;
   // Keep the service wall, but remove the glazing for an unobstructed model view.
@@ -356,6 +455,7 @@ export function buildStructure(rooms,materials){
 export function setModelDetail(model,high=true,micro=true){
   const key=`${high}:${micro}`;if(model.root.userData.detailState===key)return;model.root.userData.detailState=key;
   if(model.categories.micro)model.categories.micro.visible=micro;
+  if(model.categories.atelier)model.categories.atelier.visible=micro;
   model.root.traverse(o=>{if(o.isInstancedMesh&&o.userData.highGeometry)o.geometry=high?o.userData.highGeometry:o.userData.lowGeometry;});
 }
-export function disposeModel(root){root.traverse(obj=>{if(obj.isInstancedMesh){obj.dispose();}else if(obj.isMesh&&!SHARED_GEOMETRIES.has(obj.geometry)){obj.geometry.dispose();}});}
+export function disposeModel(root){root.traverse(obj=>{if(obj.isInstancedMesh){obj.dispose();}else if((obj.isMesh||obj.isLineSegments)&&!SHARED_GEOMETRIES.has(obj.geometry)){obj.geometry.dispose();}});for(const resource of root.userData.ownedResources||[])resource.dispose();}

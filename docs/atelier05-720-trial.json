@@ -1,0 +1,187 @@
+{
+  "edition": "ATELIER_05_CRAFT",
+  "status": "STOPPED",
+  "reason": "手動停止",
+  "viewport": {
+    "width": 1616,
+    "height": 1004,
+    "devicePixelRatio": 1,
+    "renderWidth": 3232,
+    "renderHeight": 2008
+  },
+  "criteria": {
+    "averageFPSMin": 45,
+    "frameP99msMax": 28,
+    "framesOver50msMax": 0
+  },
+  "initialResources": {
+    "geometries": 379,
+    "textures": 31,
+    "jsHeapMB": 58.8
+  },
+  "buildTimes": [
+    {
+      "name": "720 間・極致全景",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "720 間・極致近景",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "720 間・快速旋轉與縮放",
+      "reused": true,
+      "milliseconds": 0
+    },
+    {
+      "name": "720 間・極致剖面",
+      "reused": true,
+      "milliseconds": 0
+    }
+  ],
+  "results": [
+    {
+      "name": "720 間・極致全景",
+      "rooms": 720,
+      "quality": "ultra",
+      "mode": "exterior",
+      "view": "overview",
+      "detail": "FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 1000,
+      "seconds": 20,
+      "averageFPS": 50,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "OVERVIEW"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.1,
+      "frameP99ms": 20.9,
+      "maxFrameMs": 21,
+      "framesOver50ms": 0,
+      "meanSubmissionMs": 7.14,
+      "maxDrawCalls": 3170,
+      "maxTriangles": 16486988,
+      "resources": {
+        "geometries": 379,
+        "textures": 31,
+        "jsHeapMB": 64
+      },
+      "contextLosses": 0,
+      "rapidInteraction": null,
+      "smoothnessPass": true
+    },
+    {
+      "name": "720 間・極致近景",
+      "rooms": 720,
+      "quality": "ultra",
+      "mode": "exterior",
+      "view": "near",
+      "detail": "FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 2514,
+      "seconds": 60.02,
+      "averageFPS": 41.9,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "CLOSE_2K"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 40,
+      "frameP99ms": 40.1,
+      "maxFrameMs": 41.1,
+      "framesOver50ms": 0,
+      "meanSubmissionMs": 22.73,
+      "maxDrawCalls": 2651,
+      "maxTriangles": 15848596,
+      "resources": {
+        "geometries": 379,
+        "textures": 31,
+        "jsHeapMB": 50.8
+      },
+      "contextLosses": 0,
+      "rapidInteraction": null,
+      "smoothnessPass": false
+    },
+    {
+      "name": "720 間・快速旋轉與縮放",
+      "rooms": 720,
+      "quality": "ultra",
+      "mode": "exterior",
+      "view": "rapid",
+      "detail": "FULL",
+      "viewport": {
+        "width": 1616,
+        "height": 1004,
+        "renderWidth": 3232,
+        "renderHeight": 2008,
+        "pixelRatio": 2
+      },
+      "samples": 2987,
+      "seconds": 60.04,
+      "averageFPS": 49.8,
+      "renderSizes": [
+        "3232 × 2008"
+      ],
+      "surfaceModes": [
+        "OVERVIEW",
+        "CLOSE_2K"
+      ],
+      "roomCacheEntries": 8,
+      "frameP95ms": 20.8,
+      "frameP99ms": 21,
+      "maxFrameMs": 60.9,
+      "framesOver50ms": 2,
+      "meanSubmissionMs": 7.76,
+      "maxDrawCalls": 3170,
+      "maxTriangles": 16486988,
+      "resources": {
+        "geometries": 379,
+        "textures": 31,
+        "jsHeapMB": 67.6
+      },
+      "contextLosses": 0,
+      "rapidInteraction": {
+        "zoomToggles": 76,
+        "zoomIntervalMs": 800,
+        "rotationRadians": 132.04,
+        "rotationSpeedRadiansPerSecond": 2.2,
+        "cameraDistance": [
+          12.69,
+          213.18
+        ],
+        "fixedQuality": true
+      },
+      "smoothnessPass": false
+    }
+  ],
+  "finalResources": {
+    "geometries": 379,
+    "textures": 31,
+    "jsHeapMB": 55.7
+  },
+  "roomSwitches": 0,
+  "growthRebuilds": 0,
+  "smoothnessPass": false,
+  "contextLosses": 0,
+  "limits": "Short browser test only. Render frame scheduling is not input-to-photon latency. JS heap is not total process or GPU memory. Rebuilding models is measured separately from orbit/zoom. No structural strength analysis."
+}

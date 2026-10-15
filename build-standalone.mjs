@@ -3,7 +3,7 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=dirname(fileURLToPath(import.meta.url));
 const read=name=>readFile(resolve(root,'dist',name),'utf8');
-let [html,css,three,layout,surfaces,furnishings,model,app]=await Promise.all(['index.html','style.css','vendor/three.module.min.js','layout.js','surfaces.js','furnishings.js','model.js','app.js'].map(read));
+let [html,css,three,layout,surfaces,craft,furnishings,model,app]=await Promise.all(['index.html','style.css','vendor/three.module.min.js','layout.js','surfaces.js','craft.js','furnishings.js','model.js','app.js'].map(read));
 function moduleToScope(source,name,replacements={}){
   const exports=[...source.matchAll(/export\s+(?:const|function|class)\s+(\w+)/g)].map(m=>m[1]);
   source=source.replace(/^import[^\n]+\n/gm,line=>{
@@ -16,11 +16,11 @@ function moduleToScope(source,name,replacements={}){
 const exported=three.match(/export\{([^}]+)\};?\s*$/);if(!exported)throw new Error('THREE export structure changed');
 const names=exported[1].split(',').map(entry=>{let parts=entry.trim().split(/\s+as\s+/);return parts.length===2?`${parts[1]}:${parts[0]}`:parts[0];}).join(',');
 three=three.slice(0,exported.index)+`return {${names}};`;
-const compiled=[`const THREE=(()=>{${three}})();`,moduleToScope(layout,'WWLayout'),moduleToScope(surfaces,'WWSurfaces',{'three.module.min.js':'const T=THREE;', './layout.js':'const {rng,MAX_ROOMS,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;'}),moduleToScope(furnishings,'WWFurnishings',{'three.module.min.js':'const T=THREE;', './layout.js':'const {rng,MAX_ROOMS,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;'}),moduleToScope(model,'WWModel',{
+const compiled=[`const THREE=(()=>{${three}})();`,moduleToScope(layout,'WWLayout'),moduleToScope(surfaces,'WWSurfaces',{'three.module.min.js':'const T=THREE;', './layout.js':'const {rng,DESIGN_ROOMS,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;'}),moduleToScope(craft,'WWCraft',{'three.module.min.js':'const T=THREE;','./layout.js':'const {rng}=WWLayout;'}),moduleToScope(furnishings,'WWFurnishings',{'three.module.min.js':'const T=THREE;', './layout.js':'const {rng,DESIGN_ROOMS,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;'}),moduleToScope(model,'WWModel',{
   'three.module.min.js':'const T=THREE;', './layout.js':"const {SIDE,ROOM_HEIGHT,LEVEL_HEIGHT,LEVELS,getSupportPlan,getHeroAnchor,rng,hash,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;",
   './surfaces.js':'const {createTextureSet}=WWSurfaces;','./furnishings.js':'const {addPlant,addFurniture}=WWFurnishings;'
 }),moduleToScope(app,'WWApp',{
-  'three.module.min.js':'const T=THREE;', './layout.js':"const {generateRooms,getStats,buildingRadius,getEnvelope,getHeroAnchor,LEVELS,LEVEL_HEIGHT,MAX_ROOMS}=WWLayout;",'./model.js':"const {createMaterials,buildHabitat,buildLandscape,buildStructure,buildRoom,disposeModel,setModelDetail}=WWModel;",'./surfaces.js':'const {createEnvironment}=WWSurfaces;'
+  'three.module.min.js':'const T=THREE;', './layout.js':"const {generateRooms,getStats,buildingRadius,getEnvelope,getHeroAnchor,LEVELS,LEVEL_HEIGHT,ROOM_HEIGHT,MAX_ROOMS}=WWLayout;",'./model.js':"const {createMaterials,buildHabitat,buildLandscape,buildStructure,buildRoom,disposeModel,setModelDetail}=WWModel;",'./surfaces.js':'const {createEnvironment}=WWSurfaces;','./craft.js':'const {createCraftMaterials,createRoomPlaque}=WWCraft;'
 })].join('\n');
 html=html.replace('<link rel="stylesheet" href="./style.css">',()=>`<style>${css}</style>`).replace('<script type="module" src="./app.js"></script>',()=>`<script>\n${compiled.replace(/<\/script/gi,'<\\/script')}\n</script>`).replace('class="brand" href="./"','class="brand" href="#"');
 const output=process.argv[2]?resolve(process.argv[2]):resolve(root,'dist/standalone.html');await mkdir(dirname(output),{recursive:true});await writeFile(output,html);

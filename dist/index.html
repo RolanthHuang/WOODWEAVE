@@ -29,7 +29,7 @@
   <header class="header">
     <a class="brand" href="./" aria-label="木序首頁"><svg class="brand-symbol"><use href="#i-hex"/></svg><span class="brand-cn">木序</span><span class="brand-line"></span><span class="brand-en">WOODWEAVE</span></a>
     <div class="header-center">九層斜向木構 · 中段擴張，上下收尖</div>
-    <div class="header-meta"><span class="status-dot"></span> LIVE 3D <span class="header-edition">/ ATELIER 04</span></div>
+    <div class="header-meta"><span class="status-dot"></span> LIVE 3D <span class="header-edition">/ ATELIER 05</span></div>
   </header>
   <main>
     <aside class="sidebar" id="sidebar">
@@ -41,11 +41,11 @@
       <div class="controls">
         <section class="control-section scale-section">
           <div class="section-label"><span>01 <b>聚落尺度</b></span><span class="mono">GROWTH</span></div>
-          <div class="room-total"><span id="room-count">1080</span><span>個獨特房間<small>本次上限 1,080 間</small></span></div>
-          <input id="room-range" type="range" min="36" max="1080" step="6" value="1080" aria-label="房間數量">
-          <div class="range-ends"><span>36</span><span>1,080</span></div>
+          <div class="room-total"><span id="room-count">540</span><span>個獨特房間<small>本次上限 540 間</small></span></div>
+          <input id="room-range" type="range" min="36" max="540" step="6" value="540" aria-label="房間數量">
+          <div class="range-ends"><span>36</span><span>540</span></div>
           <button id="grow" class="grow-button"><svg><use href="#i-plus"/></svg>向外生長<span>＋36 間</span></button>
-          <form id="room-jump" class="room-jump"><label for="room-number">前往房間</label><input id="room-number" type="number" min="1" max="1080" value="1080" step="1" required aria-label="房間編號"><button type="submit">前往 ↗</button></form>
+          <form id="room-jump" class="room-jump"><label for="room-number">前往房間</label><input id="room-number" type="number" min="1" max="540" value="540" step="1" required aria-label="房間編號"><button type="submit">前往 ↗</button></form>
         </section>
         <section class="control-section">
           <div class="section-label"><span>02 <b>觀察方式</b></span><span class="mono">EXPLORE</span></div>
@@ -72,12 +72,12 @@
         <summary><span class="quality-dot"></span><span id="quality-label">細節 · 極致</span></summary>
         <div class="quality-body">
           <label for="quality">觀看品質</label>
-          <select id="quality" aria-label="觀看品質"><option value="auto">自動 · 近看完整細節</option><option value="ultra" selected>極致 · 整棟完整細節</option><option value="eco">輕盈 · 降低畫面負荷</option></select>
-          <p>每房皆有精細內裝。自動模式依觀看距離調整曲面與微小零件；走進房間可查看完整細節。</p>
-          <button id="run-test" class="test-button">測試 1,080 間流暢度</button>
+          <select id="quality" aria-label="觀看品質"><option value="auto">自動 · 近看完整細節</option><option value="ultra" selected>極致 · 精修材質與近看</option><option value="eco">輕盈 · 降低畫面負荷</option></select>
+          <p>靠近時呈現精修木紋與羊毛氈；走進房間可看縫線、木作接頭、柔軟織物與專屬裝置。遠景共用資源，保留流暢操作。</p>
+          <button id="run-test" class="test-button">測試 540 間流暢度</button>
           <button id="stop-test" class="test-button" hidden>停止測試</button>
           <output id="perf-live">準備就緒 · 靜止時暫停繪圖</output>
-          <p class="test-note">約 3 分鐘，包含極致全景、近景、快速旋轉縮放、剖面及換房。請讓分頁保持開啟。結果只代表當前視窗與裝置。</p>
+          <p class="test-note">約 5 分鐘，包含極致全景、60 秒近景、快速旋轉縮放、剖面、微距材質及換房。請讓分頁保持開啟。結果只代表當前視窗與裝置。</p>
           <div id="test-summary" role="status" aria-live="polite"></div>
           <details id="test-results" hidden><summary>查看測試紀錄</summary><pre id="test-json"></pre></details>
         </div>

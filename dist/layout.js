@@ -2,9 +2,10 @@
 export const SIDE = 6.4;
 export const LEVEL_HEIGHT = 3.85;
 export const ROOM_HEIGHT = 3.12;
-export const MAX_ROOMS = 1080;
+export const MAX_ROOMS = 540;
+export const DESIGN_ROOMS = 1080;
 export const LABEL_COLUMNS = 36;
-export const LABEL_ROWS = Math.ceil(MAX_ROOMS/LABEL_COLUMNS);
+export const LABEL_ROWS = Math.ceil(DESIGN_ROOMS/LABEL_COLUMNS);
 export const LEVELS = 9;
 export const FLOOR_WEIGHTS = [4,10,20,32,44,32,20,12,6];
 export const FLOOR_DRIFT = 1.35;
