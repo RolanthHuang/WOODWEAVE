@@ -1,0 +1,22 @@
+{
+  "kind": "WOODWEAVE_1080_RELEASE_QA",
+  "date": "2026-10-15",
+  "device": {
+    "chip": "Apple M4 Pro",
+    "memoryGB": 24
+  },
+  "method": "Exact release modules, with the single setQuality devicePixelRatio input changed to 2 in a separate local copy to simulate Retina. Production files retain native devicePixelRatio. All room geometry, surface generation, code paths and benchmark stages are otherwise identical.",
+  "pixelRatioSimulation": {
+    "before": "Math.min(devicePixelRatio,Math.max(1,cap-",
+    "after": "Math.min(2,Math.max(1,cap-"
+  },
+  "identicalFiles": {
+    "layout.js": "62501a2632f3ea5b0bd75aa5264e0374e6c8c320c530ab92ae80ab80a7514f8e",
+    "model.js": "581c9b5d84050a14323ac50d6025529c1c1e683dc25a7cfcb2dca02790c269a2",
+    "surfaces.js": "461a0853e20919d50f92bc68c720e1c2fdfec34c05a40e02775b4b0c947c5a82",
+    "furnishings.js": "7738edbfa9e89a793b089949f1a34c3f4e07f055178982ec09314087a884b2c5",
+    "style.css": "7ea485a805e8658cc4182a3a77d84cf18ae00d3db8a57cc260846c88c29913c4",
+    "index.html": "472a1bacb04cf32bbec62432525bb001967a9875db5e8df9edc752a1b9bbb6d6",
+    "vendor/three.module.min.js": "08fd7545d13d2c7fb65ab691530a802dafefd638596501854f267d0fb13c39e7"
+  }
+}

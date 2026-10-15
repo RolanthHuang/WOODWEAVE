@@ -16,8 +16,8 @@ function moduleToScope(source,name,replacements={}){
 const exported=three.match(/export\{([^}]+)\};?\s*$/);if(!exported)throw new Error('THREE export structure changed');
 const names=exported[1].split(',').map(entry=>{let parts=entry.trim().split(/\s+as\s+/);return parts.length===2?`${parts[1]}:${parts[0]}`:parts[0];}).join(',');
 three=three.slice(0,exported.index)+`return {${names}};`;
-const compiled=[`const THREE=(()=>{${three}})();`,moduleToScope(layout,'WWLayout'),moduleToScope(surfaces,'WWSurfaces',{'three.module.min.js':'const T=THREE;', './layout.js':'const {rng}=WWLayout;'}),moduleToScope(furnishings,'WWFurnishings',{'three.module.min.js':'const T=THREE;', './layout.js':'const {rng}=WWLayout;'}),moduleToScope(model,'WWModel',{
-  'three.module.min.js':'const T=THREE;', './layout.js':"const {SIDE,ROOM_HEIGHT,LEVEL_HEIGHT,LEVELS,getSupportPlan,getHeroAnchor,rng,hash}=WWLayout;",
+const compiled=[`const THREE=(()=>{${three}})();`,moduleToScope(layout,'WWLayout'),moduleToScope(surfaces,'WWSurfaces',{'three.module.min.js':'const T=THREE;', './layout.js':'const {rng,MAX_ROOMS,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;'}),moduleToScope(furnishings,'WWFurnishings',{'three.module.min.js':'const T=THREE;', './layout.js':'const {rng,MAX_ROOMS,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;'}),moduleToScope(model,'WWModel',{
+  'three.module.min.js':'const T=THREE;', './layout.js':"const {SIDE,ROOM_HEIGHT,LEVEL_HEIGHT,LEVELS,getSupportPlan,getHeroAnchor,rng,hash,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;",
   './surfaces.js':'const {createTextureSet}=WWSurfaces;','./furnishings.js':'const {addPlant,addFurniture}=WWFurnishings;'
 }),moduleToScope(app,'WWApp',{
   'three.module.min.js':'const T=THREE;', './layout.js':"const {generateRooms,getStats,buildingRadius,getEnvelope,getHeroAnchor,LEVELS,LEVEL_HEIGHT,MAX_ROOMS}=WWLayout;",'./model.js':"const {createMaterials,buildHabitat,buildLandscape,buildStructure,buildRoom,disposeModel,setModelDetail}=WWModel;",'./surfaces.js':'const {createEnvironment}=WWSurfaces;'

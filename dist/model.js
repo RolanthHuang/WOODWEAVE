@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.min.js';
-import {SIDE,ROOM_HEIGHT,LEVEL_HEIGHT,LEVELS,getSupportPlan,getHeroAnchor,rng,hash} from './layout.js';
+import {SIDE,ROOM_HEIGHT,LEVEL_HEIGHT,LEVELS,getSupportPlan,getHeroAnchor,rng,hash,LABEL_COLUMNS,LABEL_ROWS} from './layout.js';
 import {createTextureSet} from './surfaces.js';
 import {addPlant,addFurniture} from './furnishings.js';
 
@@ -76,7 +76,7 @@ class Batch {
   label(pos,scale,rotation,id){
     const cs=Math.cos(rotation),sn=Math.sin(rotation),p=(x,y)=>[pos[0]+x*cs,pos[1]+y,pos[2]-x*sn];
     this.quad('label','micro',p(-scale[0]/2,-scale[1]/2),p(scale[0]/2,-scale[1]/2),p(scale[0]/2,scale[1]/2),p(-scale[0]/2,scale[1]/2),'#ffffff');
-    const b=this.surfaces.get('label:micro'),u=(id%20)/20,v=1-(Math.floor(id/20)+1)/18,du=1/20,dv=1/18;
+    const b=this.surfaces.get('label:micro'),u=(id%LABEL_COLUMNS)/LABEL_COLUMNS,v=1-(Math.floor(id/LABEL_COLUMNS)+1)/LABEL_ROWS,du=1/LABEL_COLUMNS,dv=1/LABEL_ROWS;
     b.uv.splice(b.uv.length-12,12,u,v,u+du,v,u+du,v+dv,u,v,u+du,v+dv,u,v+dv);
   }
   quad(material,category,a,b,d,e,color,room=-1){this.tri(material,category,a,b,d,color,room);this.tri(material,category,a,d,e,color,room);}
@@ -123,8 +123,9 @@ function addHero(batch,room,detail=false){
     batch.cylinder('metal','micro',at(x,.189,z),[.027*s,.009*s,.027*s],'#c9bd93');
     box('dark',x,.195,z,.016,.002,.002,'#515e53');
   }
-  // Six visible height-coded light blocks guarantee different geometry within each family.
+  // Keep the original six blocks; the second bank distinguishes variants 64–119. The original 360 room designs retain their geometry.
   for(let k=0;k<6;k++){const bit=(hero.variant>>k)&1;box(bit?'light':'metal',-.45+k*.18,.19+bit*.035,.30,.10,.025+bit*.07,.06);}
+  if(hero.variant>=64)box('light',0,.225,-.30,.10,.095,.06);
   switch(hero.type){
     case 0:
       box('timber',0,.85,-.12,1.22,1.20,.11,wood);

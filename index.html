@@ -39,6 +39,8 @@
 
 .info-toggle{font-size:14px;color:#89977d;padding:0 4px;margin-right:3px}.detail-view .room-card{padding-top:11px;padding-bottom:11px}.detail-view .room-card .hero-note,.detail-view .room-card .furniture-focus,.detail-view .room-card .room-facts,.detail-view .room-card .room-palette,.detail-view .room-card>p,.detail-view .room-card .enter-button{display:none!important}.detail-view .room-card .room-title{margin-top:5px}.detail-view .room-card h2{font-size:18px;margin-bottom:0}.room-card .room-card-top>.eyebrow{flex:1}
 @media(max-width:600px){.room-card .room-card-top{gap:6px}.detail-view .room-card{padding:9px 13px;gap:3px}.detail-view .room-card .room-title{margin-top:0}.detail-view .room-card h2{font-size:16px}.detail-view .room-card .room-card-top{grid-row:1/3;align-self:center}.detail-view .room-card .room-arrows{gap:14px}}
+
+.room-jump{display:flex;align-items:center;gap:8px;margin-top:14px;color:#7b8870;font-size:10px}.room-jump input{min-width:0;width:67px;padding:5px 6px;border:1px solid #cbd4c0;border-radius:3px;background:#fffdf7;color:#53674d;font:inherit;font-variant-numeric:tabular-nums}.room-jump button{margin-left:auto;padding:5px 0;color:#536b45;font-size:10px}
 </style>
 </head>
 <body>
@@ -61,7 +63,7 @@
   <header class="header">
     <a class="brand" href="#" aria-label="木序首頁"><svg class="brand-symbol"><use href="#i-hex"/></svg><span class="brand-cn">木序</span><span class="brand-line"></span><span class="brand-en">WOODWEAVE</span></a>
     <div class="header-center">九層斜向木構 · 中段擴張，上下收尖</div>
-    <div class="header-meta"><span class="status-dot"></span> LIVE 3D <span class="header-edition">/ ATELIER 03</span></div>
+    <div class="header-meta"><span class="status-dot"></span> LIVE 3D <span class="header-edition">/ ATELIER 04</span></div>
   </header>
   <main>
     <aside class="sidebar" id="sidebar">
@@ -73,10 +75,11 @@
       <div class="controls">
         <section class="control-section scale-section">
           <div class="section-label"><span>01 <b>聚落尺度</b></span><span class="mono">GROWTH</span></div>
-          <div class="room-total"><span id="room-count">180</span><span>個獨特房間<small>本次上限 360 間</small></span></div>
-          <input id="room-range" type="range" min="36" max="360" step="6" value="180" aria-label="房間數量">
-          <div class="range-ends"><span>36</span><span>360</span></div>
+          <div class="room-total"><span id="room-count">1080</span><span>個獨特房間<small>本次上限 1,080 間</small></span></div>
+          <input id="room-range" type="range" min="36" max="1080" step="6" value="1080" aria-label="房間數量">
+          <div class="range-ends"><span>36</span><span>1,080</span></div>
           <button id="grow" class="grow-button"><svg><use href="#i-plus"/></svg>向外生長<span>＋36 間</span></button>
+          <form id="room-jump" class="room-jump"><label for="room-number">前往房間</label><input id="room-number" type="number" min="1" max="1080" value="1080" step="1" required aria-label="房間編號"><button type="submit">前往 ↗</button></form>
         </section>
         <section class="control-section">
           <div class="section-label"><span>02 <b>觀察方式</b></span><span class="mono">EXPLORE</span></div>
@@ -100,15 +103,15 @@
       <canvas id="scene" tabindex="0" aria-label="建築模型。拖曳旋轉，滾輪縮放，右鍵平移；點選房間後可進入。方向鍵旋轉，加減鍵縮放，Home 返回全景。"></canvas>
       <div class="scene-caption"><span class="caption-rule"></span><div><span class="mono" id="scene-label">01 / THE INCLINED DIAMOND</span><small id="scene-description">九層菱形聚落 · 中段最寬</small></div></div>
       <details class="quality-panel" id="quality-panel">
-        <summary><span class="quality-dot"></span><span id="quality-label">細節 · 自動</span></summary>
+        <summary><span class="quality-dot"></span><span id="quality-label">細節 · 極致</span></summary>
         <div class="quality-body">
           <label for="quality">觀看品質</label>
-          <select id="quality" aria-label="觀看品質"><option value="auto">自動 · 近看完整細節</option><option value="ultra">極致 · 整棟完整細節</option><option value="eco">輕盈 · 降低畫面負荷</option></select>
+          <select id="quality" aria-label="觀看品質"><option value="auto">自動 · 近看完整細節</option><option value="ultra" selected>極致 · 整棟完整細節</option><option value="eco">輕盈 · 降低畫面負荷</option></select>
           <p>每房皆有精細內裝。自動模式依觀看距離調整曲面與微小零件；走進房間可查看完整細節。</p>
-          <button id="run-test" class="test-button">測試 180／360 間負載</button>
+          <button id="run-test" class="test-button">測試 1,080 間流暢度</button>
           <button id="stop-test" class="test-button" hidden>停止測試</button>
           <output id="perf-live">準備就緒 · 靜止時暫停繪圖</output>
-          <p class="test-note">約 3 分鐘，包含全景、剖面、單房及反覆切換。請讓分頁保持開啟。結果只代表當前視窗與裝置。</p>
+          <p class="test-note">約 3 分鐘，包含極致全景、近景、快速旋轉縮放、剖面及換房。請讓分頁保持開啟。結果只代表當前視窗與裝置。</p>
           <div id="test-summary" role="status" aria-live="polite"></div>
           <details id="test-results" hidden><summary>查看測試紀錄</summary><pre id="test-json"></pre></details>
         </div>
@@ -156,7 +159,9 @@ const WWLayout=(()=>{
 const SIDE = 6.4;
 const LEVEL_HEIGHT = 3.85;
 const ROOM_HEIGHT = 3.12;
-const MAX_ROOMS = 360;
+const MAX_ROOMS = 1080;
+const LABEL_COLUMNS = 36;
+const LABEL_ROWS = Math.ceil(MAX_ROOMS/LABEL_COLUMNS);
 const LEVELS = 9;
 const FLOOR_WEIGHTS = [4,10,20,32,44,32,20,12,6];
 const FLOOR_DRIFT = 1.35;
@@ -189,7 +194,7 @@ const HERO_FAMILIES=[
   {short:'星圖',title:'星圖光牆',desc:'光點與連線在牆面構成獨立星圖，每間都有自己的座標。'},
   {short:'藏光',title:'稜鏡藏光架',desc:'錯位幾何框格與細光帶，組成一座不同形態的收藏裝置。'}
 ];
-function getHero(id,seed){const type=id%HERO_FAMILIES.length,variant=Math.floor(id/HERO_FAMILIES.length),family=HERO_FAMILIES[type];const a=['晨','霧','森','月','潮','星','暮','雲'],b=['序','汐','弧','境','律','脈'];return {type,variant,seed:hash(seed,type,variant),name:`${family.short}・${a[variant%8]}${b[Math.floor(variant/8)%6]}`,title:family.title,description:family.desc,signature:`${type}:${variant}`};}
+function getHero(id,seed){const type=id%HERO_FAMILIES.length,variant=Math.floor(id/HERO_FAMILIES.length),family=HERO_FAMILIES[type];const a=['晨','霧','森','月','潮','星','暮','雲'],b=['序','汐','弧','境','律','脈','嶼','澄','影','穹','紋','嵐','瀾','泉','岫'];return {type,variant,seed:hash(seed,type,variant),name:`${family.short}・${a[variant%8]}${b[Math.floor(variant/8)%b.length]}`,title:family.title,description:family.desc,signature:`${type}:${variant}`};}
 function getHeroAnchor(room){const index=room.faces===6?room.local.reduce((best,p,i)=>Math.hypot(...p)>Math.hypot(...room.local[best])?i:best,0):room.hero.variant%room.poly.length;const p=room.poly[index],fraction=room.faces===4?.43:.64;return {x:room.center[0]+(p[0]-room.center[0])*fraction,z:room.center[1]+(p[1]-room.center[1])*fraction,scale:room.faces===4?.62:room.faces===6?1.0:.85};}
 function hash(a,b=0,c=0){let n=Math.imul(a+131,374761393)^Math.imul(b+911,668265263)^Math.imul(c+53,1274126177);n=Math.imul(n^(n>>>13),1274126177);return (n^(n>>>16))>>>0;}
 function rng(seed){let a=seed>>>0;return ()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
@@ -246,11 +251,11 @@ function getSupportPlan(rooms){
   return {envelope,columns:[{x:middle.minX-.45,z:0,top:middle.y-.1},{x:middle.maxX+.45,z:0,top:middle.y-.1}],core:{x:0,z:0,halfWidth:1.35,height:(LEVELS-1)*LEVEL_HEIGHT+3.58},bearingVerification:'NOT_ANALYSED'};
 }
 
-return {SIDE,LEVEL_HEIGHT,ROOM_HEIGHT,MAX_ROOMS,LEVELS,FLOOR_WEIGHTS,FLOOR_DRIFT,floorOffset,WOODS,ACCENTS,PROGRAMS,FEATURES,HERO_FAMILIES,getHero,getHeroAnchor,hash,rng,generateRooms,getStats,buildingRadius,getEnvelope,getSupportPlan};
+return {SIDE,LEVEL_HEIGHT,ROOM_HEIGHT,MAX_ROOMS,LABEL_COLUMNS,LABEL_ROWS,LEVELS,FLOOR_WEIGHTS,FLOOR_DRIFT,floorOffset,WOODS,ACCENTS,PROGRAMS,FEATURES,HERO_FAMILIES,getHero,getHeroAnchor,hash,rng,generateRooms,getStats,buildingRadius,getEnvelope,getSupportPlan};
 })();
 const WWSurfaces=(()=>{
 const T=THREE;
-const {rng}=WWLayout;
+const {rng,MAX_ROOMS,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;
 
 // All surface images are generated locally. Colour and height maps use separate
 // colour spaces, so the weave and wood pores also respond to the real lights.
@@ -340,13 +345,14 @@ function createTextureSet(){
   const contact=bitmap(128,(ctx,n)=>{
     const g=ctx.createRadialGradient(n/2,n/2,5,n/2,n/2,n/2);g.addColorStop(0,'rgba(33,35,25,.32)');g.addColorStop(.48,'rgba(33,35,25,.17)');g.addColorStop(1,'rgba(33,35,25,0)');ctx.fillStyle=g;ctx.fillRect(0,0,n,n);
   });
-  const label=bitmap(1024,(ctx,n)=>{
+  const label=bitmap(2048,(ctx,n)=>{
     ctx.fillStyle='#c7bda1';ctx.fillRect(0,0,n,n);ctx.fillStyle='#3c4c43';
-    // A single atlas retains legible individual room numbers without 360 textures.
-    for(let id=0;id<360;id++){
-      const x=(id%20)*51.2,y=Math.floor(id/20)*56.88;
-      ctx.font='bold 12px sans-serif';ctx.fillText(`W ${String(id+1).padStart(3,'0')}`,x+5,y+24);
-      ctx.fillRect(x+6,y+32,26,1);ctx.font='5px sans-serif';ctx.fillText('PRIVATE SUITE',x+6,y+43);
+    // One shared atlas covers every plaque, including the four-digit room numbers.
+    const cellWidth=n/LABEL_COLUMNS,cellHeight=n/LABEL_ROWS;
+    for(let id=0;id<MAX_ROOMS;id++){
+      const x=(id%LABEL_COLUMNS)*cellWidth,y=Math.floor(id/LABEL_COLUMNS)*cellHeight;
+      ctx.font='bold 13px sans-serif';ctx.fillText(`W ${String(id+1).padStart(3,'0')}`,x+5,y+cellHeight*.42);
+      ctx.fillRect(x+6,y+cellHeight*.58,cellWidth-12,1);ctx.font='5px sans-serif';ctx.fillText('PRIVATE SUITE',x+6,y+cellHeight*.78);
     }
   });
   return {wood,woodHeight,woodRoughness,floor,textile,textileHeight,wool,woolHeight,woodfelt,woodfeltHeight,stone,screen,contact,label};
@@ -364,7 +370,7 @@ return {createTextureSet,createEnvironment};
 })();
 const WWFurnishings=(()=>{
 const T=THREE;
-const {rng}=WWLayout;
+const {rng,MAX_ROOMS,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;
 
 function addPlant(batch,x,y,z,size=1,color='#75876b',category='furniture'){
   batch.instance('pot','ceramic',category,[x,y+.20*size,z],[.44*size,.40*size,.44*size],'#ece5d4');
@@ -554,7 +560,7 @@ return {addPlant,addFurniture};
 })();
 const WWModel=(()=>{
 const T=THREE;
-const {SIDE,ROOM_HEIGHT,LEVEL_HEIGHT,LEVELS,getSupportPlan,getHeroAnchor,rng,hash}=WWLayout;
+const {SIDE,ROOM_HEIGHT,LEVEL_HEIGHT,LEVELS,getSupportPlan,getHeroAnchor,rng,hash,LABEL_COLUMNS,LABEL_ROWS}=WWLayout;
 const {createTextureSet}=WWSurfaces;
 const {addPlant,addFurniture}=WWFurnishings;
 
@@ -631,7 +637,7 @@ class Batch {
   label(pos,scale,rotation,id){
     const cs=Math.cos(rotation),sn=Math.sin(rotation),p=(x,y)=>[pos[0]+x*cs,pos[1]+y,pos[2]-x*sn];
     this.quad('label','micro',p(-scale[0]/2,-scale[1]/2),p(scale[0]/2,-scale[1]/2),p(scale[0]/2,scale[1]/2),p(-scale[0]/2,scale[1]/2),'#ffffff');
-    const b=this.surfaces.get('label:micro'),u=(id%20)/20,v=1-(Math.floor(id/20)+1)/18,du=1/20,dv=1/18;
+    const b=this.surfaces.get('label:micro'),u=(id%LABEL_COLUMNS)/LABEL_COLUMNS,v=1-(Math.floor(id/LABEL_COLUMNS)+1)/LABEL_ROWS,du=1/LABEL_COLUMNS,dv=1/LABEL_ROWS;
     b.uv.splice(b.uv.length-12,12,u,v,u+du,v,u+du,v+dv,u,v,u+du,v+dv,u,v+dv);
   }
   quad(material,category,a,b,d,e,color,room=-1){this.tri(material,category,a,b,d,color,room);this.tri(material,category,a,d,e,color,room);}
@@ -678,8 +684,9 @@ function addHero(batch,room,detail=false){
     batch.cylinder('metal','micro',at(x,.189,z),[.027*s,.009*s,.027*s],'#c9bd93');
     box('dark',x,.195,z,.016,.002,.002,'#515e53');
   }
-  // Six visible height-coded light blocks guarantee different geometry within each family.
+  // Keep the original six blocks; the second bank distinguishes variants 64–119. The original 360 room designs retain their geometry.
   for(let k=0;k<6;k++){const bit=(hero.variant>>k)&1;box(bit?'light':'metal',-.45+k*.18,.19+bit*.035,.30,.10,.025+bit*.07,.06);}
+  if(hero.variant>=64)box('light',0,.225,-.30,.10,.095,.06);
   switch(hero.type){
     case 0:
       box('timber',0,.85,-.12,1.22,1.20,.11,wood);
@@ -923,7 +930,7 @@ const {createMaterials,buildHabitat,buildLandscape,buildStructure,buildRoom,disp
 const {createEnvironment}=WWSurfaces;
 
 const $=id=>document.getElementById(id),canvas=$('scene'),viewport=$('viewport');
-const state={count:180,mode:'exterior',floor:-1,explode:0,night:false,spin:false,interior:false,selected:0,quality:'auto'};
+const state={count:MAX_ROOMS,mode:'exterior',floor:-1,explode:0,night:false,spin:false,interior:false,selected:0,quality:'ultra'};
 let rooms=[],habitat,landscape,structure,interiorModel,radius=35,renderHandle=0,lastTime=0,toastTimer,rangeTimer;
 const scene=new T.Scene(),materials=createMaterials();
 let renderer;
@@ -936,7 +943,7 @@ try{
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
 renderer.shadowMap.autoUpdate=false;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;renderer.outputColorSpace=T.SRGBColorSpace;
 const environment=createEnvironment(renderer);scene.environment=environment.texture;scene.environmentIntensity=.42;
-const camera=new T.PerspectiveCamera(37,1,.1,600);
+const camera=new T.PerspectiveCamera(37,1,.1,2000);
 const hemi=new T.HemisphereLight('#faf5e7','#9ca08e',1.55);scene.add(hemi);
 const sun=new T.DirectionalLight('#fff5df',2.7);sun.position.set(25,55,30);sun.castShadow=true;
 sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.near=.5;sun.shadow.camera.far=180;sun.shadow.normalBias=.08;sun.shadow.bias=-.00012;sun.shadow.radius=3;scene.add(sun);
@@ -963,7 +970,7 @@ function resize(){const w=viewport.clientWidth,h=viewport.clientHeight;renderer.
 new ResizeObserver(resize).observe(viewport);
 function render(time){
   renderHandle=0;const dt=Math.min((time-(lastTime||time))/1000,.06);lastTime=time;
-  if(state.spin&&!document.hidden)orbit.goalTheta+=dt*.13;
+  if(state.spin&&!document.hidden)orbit.goalTheta+=dt*(benchmark?.stage?.rapid?2.2:.13);
   const ease=1-Math.pow(.001,Math.max(dt,1/120));
   orbit.theta+=(orbit.goalTheta-orbit.theta)*ease;orbit.phi+=(orbit.goalPhi-orbit.phi)*ease;orbit.distance+=(orbit.goalDistance-orbit.distance)*ease;orbit.target.lerp(orbit.goalTarget,ease);
   const sph=new T.Spherical(orbit.distance,orbit.phi,orbit.theta);camera.position.setFromSpherical(sph).add(orbit.target);camera.lookAt(orbit.target);
@@ -1001,10 +1008,13 @@ function regenerate(count,{notify=false}={}){
   $('floor-profile').innerHTML=stats.perFloor.map((n,l)=>({n,l})).reverse().map(({n,l})=>`<button data-floor="${l}" aria-pressed="false" title="${l+1}F · ${n} 間房間"><span class="floor-num">${l+1}F</span><span class="floor-track"><span class="floor-bar" style="width:${Math.max(8,n/Math.max(...stats.perFloor)*94)}%;left:${(l-4)*.8}px"></span></span><span class="floor-rooms">${n}</span></button>`).join('');
   $('room-range').value=state.count;paintRange($('room-range'));$('grow').disabled=state.count>=MAX_ROOMS;$('grow').querySelector('span').textContent=state.count>=MAX_ROOMS?'已達本次上限':'＋36 間';
   canvas.dataset.rooms=stats.total;canvas.dataset.uniqueRooms=new Set(rooms.map(r=>r.signature)).size;canvas.dataset.uniqueHeroes=new Set(rooms.map(r=>r.hero.signature)).size;canvas.dataset.levels=stats.levels;canvas.dataset.floorDistribution=stats.perFloor.join(',');canvas.dataset.supportColumns='2';canvas.dataset.strengthAnalysis='NOT_ANALYSED';
+  sun.position.set(25,55,30).normalize().multiplyScalar(Math.max(67,radius*2.3));sun.shadow.camera.far=Math.max(180,radius*5);
   sun.shadow.camera.left=-radius*1.3;sun.shadow.camera.right=radius*1.3;sun.shadow.camera.top=radius*1.3;sun.shadow.camera.bottom=-radius*1.3;sun.shadow.camera.updateProjectionMatrix();
+  scene.fog.near=fitDistance()+radius*2;scene.fog.far=fitDistance()+radius*5;
+  $('room-number').max=state.count;
   orbit.goalDistance=fitDistance();orbit.goalTarget.set(0,overviewHeight(),0);
   applyVisibility();updateSelection();shadowUpdate();
-  if(notify)toast(state.count===MAX_ROOMS?'已生長至 360 間；本次顯示上限已達成。':`聚落已向外延伸，目前共有 ${state.count} 個房間。`);
+  if(notify)toast(state.count===MAX_ROOMS?`已生長至 ${MAX_ROOMS.toLocaleString()} 間；本次顯示上限已達成。`:`聚落已向外延伸，目前共有 ${state.count} 個房間。`);
 }
 function applyVisibility(){
   if(!habitat)return;
@@ -1027,6 +1037,7 @@ function updateSelection(){
   $('selected-id').textContent=room.code;$('selected-name').textContent=room.program.name;$('selected-desc').textContent=room.program.desc;$('selected-level').textContent=`${room.level+1}F`;
   $('selected-type').textContent={4:'四面體',5:'五面體',6:'六面體'}[room.faces];$('selected-area').textContent=`${room.area.toFixed(1)} m²`;$('selected-material').textContent=room.wood.name;
   $('swatch-wood').style.background=room.wood.color;$('swatch-accent').style.background=room.accent;$('selected-feature').textContent=room.hero.title;
+  $('room-number').value=room.id+1;
   $('hero-name').textContent=room.hero.name;$('hero-description').textContent=room.hero.description;
   canvas.dataset.selected=room.code;canvas.dataset.roomType=room.faces;canvas.dataset.roomSignature=room.signature;canvas.dataset.hero=room.hero.signature;
   while(highlight.children.length){const child=highlight.children[0];highlight.remove(child);child.geometry?.dispose();child.material?.dispose();}
@@ -1075,6 +1086,7 @@ $('grow').addEventListener('click',()=>regenerate(Math.min(MAX_ROOMS,state.count
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{if(state.interior)leaveRoom();state.mode=b.dataset.mode;if(state.mode==='structure'){state.floor=-1;state.explode=0;$('explode').value=0;$('explode-value').textContent='0%';paintRange($('explode'));orbit.goalTarget.set(0,overviewHeight(),0);orbit.goalDistance=fitDistance();}applyVisibility();}));
 $('floor-controls').addEventListener('click',event=>{const b=event.target.closest('[data-floor]');if(!b)return;if(state.interior)leaveRoom();if(state.mode==='structure')state.mode='cutaway';state.floor=Number(b.dataset.floor);applyVisibility();if(state.floor>=0){const choice=rooms.find(r=>r.level===state.floor);if(choice)selectRoom(choice.id);const e=getEnvelope(rooms)[state.floor];orbit.goalTarget.set((e.minX+e.maxX)/2,state.floor*(LEVEL_HEIGHT+state.explode*.035)+1.6,(e.minZ+e.maxZ)/2);orbit.goalDistance=Math.max(25,(e.maxX-e.minX)*1.65,(e.maxZ-e.minZ)*2.5);requestRender();}else{orbit.goalTarget.set(0,overviewHeight(),0);orbit.goalDistance=fitDistance();requestRender();}});
 $('explode').addEventListener('input',e=>{if(state.interior)leaveRoom();if(state.mode==='structure')state.mode='cutaway';state.floor=-1;state.explode=Number(e.target.value);$('explode-value').textContent=`${state.explode}%`;paintRange(e.target);orbit.goalTarget.set(0,overviewHeight(),0);orbit.goalDistance=fitDistance();applyVisibility();shadowUpdate();});
+$('room-jump').addEventListener('submit',e=>{e.preventDefault();const input=$('room-number');if(!input.reportValidity())return;selectRoom(Number(input.value)-1);});
 $('prev-room').addEventListener('click',()=>selectRoom(state.selected-1));$('next-room').addEventListener('click',()=>selectRoom(state.selected+1));
 $('enter-room').addEventListener('click',()=>enterRoom(state.interior));$('back').addEventListener('click',()=>leaveRoom());
 function collapseRoomInfo(){document.body.classList.add('detail-view');$('toggle-room-info').setAttribute('aria-label','展開房間資訊');$('toggle-room-info').setAttribute('aria-expanded','false');$('toggle-room-info').textContent='＋';}
@@ -1152,6 +1164,7 @@ function updateDetail(){
 }
 const memorySnapshot=()=>({geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,
   jsHeapMB:performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576*10)/10:null});
+function percentile(samples,p){const sorted=samples.slice().sort((a,b)=>a-b);return sorted[Math.min(sorted.length-1,Math.floor(sorted.length*p))]||0;}
 function measureFrame(time,submit){
   const gap=time-(measureFrame.previous||time);measureFrame.previous=time;
   if(gap>0&&gap<250){frameWindow.push(gap);if(frameWindow.length>90)frameWindow.shift();}
@@ -1164,66 +1177,83 @@ function measureFrame(time,submit){
     }
   }
   if(!benchmark)return;
-  const b=benchmark,stage=b.stages[b.index];
+  const b=benchmark,stage=b.stage;
   if(!b.stageStart)b.stageStart=time;
-  const elapsed=time-b.stageStart;
+  const elapsed=time-b.stageStart,warmup=stage.rapid?6000:3000,duration=stage.duration||20000;
+  // Count all measured gaps, including the first rapid zoom and long stalls.
+  if(elapsed>=warmup&&b.lastSample){
+    b.samples.push(time-b.lastSample);b.submits.push(submit);b.calls=Math.max(b.calls,renderer.info.render.calls);b.triangles=Math.max(b.triangles,renderer.info.render.triangles);
+    if(stage.rapid){
+      if(b.motionStartTheta===null)b.motionStartTheta=orbit.theta;
+      b.motionMin=Math.min(b.motionMin,orbit.distance);b.motionMax=Math.max(b.motionMax,orbit.distance);b.motionRadians=Math.abs(orbit.theta-b.motionStartTheta);
+      const phase=Math.floor((elapsed-warmup)/800);
+      if(phase!==b.zoomPhase){b.zoomPhase=phase;zoom((phase%2===0?12:b.farDistance)/orbit.goalDistance);b.zoomToggles++;}
+      orbit.goalPhi=1.16+Math.sin((elapsed-warmup)/1800)*.15;
+    }
+  }
+  b.lastSample=time;
   if(stage.cycle&&elapsed-b.lastCycle>650){
     b.lastCycle=elapsed;
-    if(b.cycles<24){selectRoom(state.selected+1);b.cycles++;}
-    else if(b.cycles<28){regenerate(b.cycles%2?360:180);b.cycles++;state.mode='cutaway';state.spin=true;applyVisibility();}
+    if(b.cycles<24){selectRoom(state.selected+1);b.cycles++;b.roomSwitches++;}
+    else if(b.cycles<28){regenerate(b.cycles%2?MAX_ROOMS:720);b.cycles++;b.growthRebuilds++;state.mode='cutaway';state.spin=true;applyVisibility();}
   }
-  if(elapsed>3000&&b.lastSample&&gap>0){b.samples.push(time-b.lastSample);b.submits.push(submit);b.calls=Math.max(b.calls,renderer.info.render.calls);b.triangles=Math.max(b.triangles,renderer.info.render.triangles);}
-  b.lastSample=time;
-  $('test-summary').textContent=`${b.index+1} / ${b.stages.length} · ${stage.name} · ${Math.min(20,Math.floor(Math.max(0,elapsed-3000)/1000))} / 20 秒`;
-  if(elapsed>=23000){
-    const sorted=b.samples.slice().sort((a,b)=>a-b),sum=b.samples.reduce((a,b)=>a+b,0);
-    b.results.push({name:stage.name,rooms:state.count,quality:state.quality,mode:state.interior?'interior':state.mode,
+  if(time-(b.lastPaint||0)>450){$('test-summary').textContent=`${b.index+1} / ${b.stages.length} · ${stage.name} · ${Math.min(duration/1000,Math.floor(Math.max(0,elapsed-warmup)/1000))} / ${duration/1000} 秒`;b.lastPaint=time;}
+  if(elapsed>=warmup+duration){
+    const sum=b.samples.reduce((a,b)=>a+b,0),fps=1000*b.samples.length/sum,p99=percentile(b.samples,.99),slow=b.samples.filter(n=>n>50).length;
+    b.results.push({name:stage.name,rooms:state.count,quality:state.quality,mode:state.interior?'interior':state.mode,view:stage.rapid?'rapid':stage.near?'near':stage.interior?'interior':'overview',detail:canvas.dataset.detail,
       viewport:{width:viewport.clientWidth,height:viewport.clientHeight,renderWidth:canvas.width,renderHeight:canvas.height,pixelRatio:renderer.getPixelRatio()},
-      samples:b.samples.length,seconds:+(sum/1000).toFixed(2),averageFPS:+(1000*b.samples.length/sum).toFixed(1),
-      frameP95ms:+(sorted[Math.floor(sorted.length*.95)]||0).toFixed(2),frameP99ms:+(sorted[Math.floor(sorted.length*.99)]||0).toFixed(2),
-      framesOver50ms:b.samples.filter(n=>n>50).length,meanSubmissionMs:+(b.submits.reduce((a,b)=>a+b,0)/b.submits.length).toFixed(2),
-      maxDrawCalls:b.calls,maxTriangles:b.triangles,resources:memorySnapshot(),contextLosses});
+      samples:b.samples.length,seconds:+(sum/1000).toFixed(2),averageFPS:+fps.toFixed(1),
+      frameP95ms:+percentile(b.samples,.95).toFixed(2),frameP99ms:+p99.toFixed(2),maxFrameMs:+Math.max(...b.samples).toFixed(2),framesOver50ms:slow,
+      meanSubmissionMs:+(b.submits.reduce((a,b)=>a+b,0)/b.submits.length).toFixed(2),maxDrawCalls:b.calls,maxTriangles:b.triangles,resources:memorySnapshot(),contextLosses,
+      rapidInteraction:stage.rapid?{zoomToggles:b.zoomToggles,zoomIntervalMs:800,rotationRadians:+b.motionRadians.toFixed(2),rotationSpeedRadiansPerSecond:2.2,cameraDistance:[+b.motionMin.toFixed(2),+b.motionMax.toFixed(2)],fixedQuality:true}:null,
+      smoothnessPass:stage.cycle?null:fps>=45&&p99<=28&&slow===0&&contextLosses===0});
     b.index++;
-    if(b.index>=b.stages.length){finishBenchmark();return;}
-    startBenchmarkStage();
+    if(b.index>=b.stages.length){finishBenchmark();return;}startBenchmarkStage();
   }
 }
 function startBenchmarkStage(){
-  const b=benchmark,stage=b.stages[b.index];b.stageStart=0;b.lastSample=0;b.lastCycle=0;b.cycles=0;b.samples=[];b.submits=[];b.calls=0;b.triangles=0;
+  const b=benchmark,stage=b.stages[b.index];b.stage=stage;b.stageStart=0;b.lastSample=0;b.lastCycle=0;b.cycles=0;b.samples=[];b.submits=[];b.calls=0;b.triangles=0;b.zoomPhase=-1;b.zoomToggles=0;b.motionStartTheta=null;b.motionMin=Infinity;b.motionMax=0;b.motionRadians=0;
   if(state.interior)leaveRoom(false);state.explode=0;state.floor=-1;state.mode=stage.mode||'exterior';$('explode').value=0;$('explode-value').textContent='0%';paintRange($('explode'));
-  const began=performance.now();regenerate(stage.count);b.buildTimes.push({name:stage.name,milliseconds:Math.round(performance.now()-began)});
+  const began=performance.now(),reuse=state.count===stage.count;if(!reuse)regenerate(stage.count);b.buildTimes.push({name:stage.name,reused:reuse,milliseconds:Math.round(performance.now()-began)});
   setQuality(stage.quality);resetView();state.mode=stage.mode||'exterior';applyVisibility();
+  if(stage.near||stage.rapid){
+    const r=rooms.filter(r=>r.level===4).reduce((a,r)=>Math.hypot(...r.center)<Math.hypot(...a.center)?r:a);
+    orbit.goalTarget.set(r.center[0],r.level*LEVEL_HEIGHT+1.5,r.center[1]);orbit.goalDistance=stage.near?24:fitDistance()*1.10;orbit.goalPhi=1.16;
+  }
   if(stage.interior){selectRoom(rooms.find(r=>r.faces===6&&r.program.kind==='work')?.id||0);enterRoom();$('focus-furniture').click();}
+  orbit.distance=orbit.goalDistance;orbit.phi=orbit.goalPhi;orbit.theta=orbit.goalTheta;orbit.target.copy(orbit.goalTarget);b.farDistance=fitDistance()*1.10;
   state.spin=true;setButton($('rotate'),true);requestRender();
 }
 function finishBenchmark(reason=null){
   if(!benchmark)return;const b=benchmark;benchmark=null;state.spin=false;setButton($('rotate'),false);
-  const result={edition:'ATELIER_03',status:reason?'STOPPED':'COMPLETED',reason,
+  const result={edition:'ATELIER_04_1080',status:reason?'STOPPED':'COMPLETED',reason,
     viewport:{width:viewport.clientWidth,height:viewport.clientHeight,devicePixelRatio,renderWidth:canvas.width,renderHeight:canvas.height},
-    initialResources:b.initialResources,buildTimes:b.buildTimes,results:b.results,finalResources:memorySnapshot(),roomSwitches:Math.min(24,b.cycles),growthRebuilds:Math.max(0,b.cycles-24),
-    contextLosses,limits:'Short browser test only; JS heap is not total process or GPU memory. No structural strength analysis.'};
+    criteria:{averageFPSMin:45,frameP99msMax:28,framesOver50msMax:0},
+    initialResources:b.initialResources,buildTimes:b.buildTimes,results:b.results,finalResources:memorySnapshot(),roomSwitches:b.roomSwitches,growthRebuilds:b.growthRebuilds,
+    smoothnessPass:!reason&&b.results.filter(r=>r.smoothnessPass!==null).every(r=>r.smoothnessPass),contextLosses,
+    limits:'Short browser test only. Render frame scheduling is not input-to-photon latency. JS heap is not total process or GPU memory. Rebuilding models is measured separately from orbit/zoom. No structural strength analysis.'};
   $('test-json').textContent=JSON.stringify(result,null,2);$('test-results').hidden=false;
-  $('test-summary').textContent=reason?reason:`完成 ${b.results.length} 組測試 · 顯示中斷 ${contextLosses} 次。`;
+  $('test-summary').textContent=reason||`完成 ${b.results.length} 組測試 · 顯示中斷 ${contextLosses} 次。`;
   $('run-test').hidden=false;$('stop-test').hidden=true;
-  if(!reason){setQuality('auto');if(state.interior)leaveRoom();state.mode='exterior';regenerate(180);resetView();toast('容量測試完成，結果保留在細節面板。');}
+  if(!reason){if(state.interior)leaveRoom();state.mode='exterior';if(state.count!==MAX_ROOMS)regenerate(MAX_ROOMS);selectRoom(b.originalSelected);setQuality(b.originalQuality);resetView();toast('流暢度測試完成，結果保留在細節面板。');}
   requestRender();
 }
 $('quality').addEventListener('change',e=>{if(benchmark)finishBenchmark('手動調整品質，測試停止');setQuality(e.target.value);});
 $('run-test').addEventListener('click',()=>{
   if(benchmark)return;if(state.night)setNight();
-  benchmark={index:0,results:[],buildTimes:[],initialResources:memorySnapshot(),stages:[
-    {name:'180 間・自動全景',count:180,quality:'auto'},
-    {name:'360 間・自動全景',count:360,quality:'auto'},
-    {name:'360 間・極致全景',count:360,quality:'ultra'},
-    {name:'360 間・極致剖面',count:360,quality:'ultra',mode:'cutaway'},
-    {name:'單房・材質近看',count:360,quality:'ultra',interior:true},
-    {name:'24 次換房與反覆增建',count:360,quality:'ultra',interior:true,cycle:true}
+  benchmark={index:0,results:[],buildTimes:[],roomSwitches:0,growthRebuilds:0,originalSelected:state.selected,originalQuality:state.quality,initialResources:memorySnapshot(),stages:[
+    {name:'1,080 間・極致全景',count:MAX_ROOMS,quality:'ultra'},
+    {name:'1,080 間・極致近景',count:MAX_ROOMS,quality:'ultra',near:true},
+    {name:'1,080 間・快速旋轉與縮放',count:MAX_ROOMS,quality:'ultra',rapid:true,duration:60000},
+    {name:'1,080 間・極致剖面',count:MAX_ROOMS,quality:'ultra',mode:'cutaway',duration:12000},
+    {name:'單房・材質近看',count:MAX_ROOMS,quality:'ultra',interior:true,duration:12000},
+    {name:'24 次換房與反覆增建',count:MAX_ROOMS,quality:'ultra',interior:true,cycle:true}
   ]};
   $('run-test').hidden=true;$('stop-test').hidden=false;$('test-results').hidden=true;startBenchmarkStage();
 });
 $('stop-test').addEventListener('click',()=>finishBenchmark('手動停止'));
 
-regenerate(180);setQuality('auto');orbit.distance=orbit.goalDistance;orbit.target.copy(orbit.goalTarget);setViewActive('axon');resize();
+regenerate(MAX_ROOMS);setQuality('ultra');orbit.distance=orbit.goalDistance;orbit.target.copy(orbit.goalTarget);setViewActive('axon');resize();
 requestAnimationFrame(()=>{$('loader').classList.add('done');canvas.dataset.ready='true';setTimeout(()=>$('loader').hidden=true,550);});
 
 return {};

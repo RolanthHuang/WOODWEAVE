@@ -2,7 +2,9 @@
 export const SIDE = 6.4;
 export const LEVEL_HEIGHT = 3.85;
 export const ROOM_HEIGHT = 3.12;
-export const MAX_ROOMS = 360;
+export const MAX_ROOMS = 1080;
+export const LABEL_COLUMNS = 36;
+export const LABEL_ROWS = Math.ceil(MAX_ROOMS/LABEL_COLUMNS);
 export const LEVELS = 9;
 export const FLOOR_WEIGHTS = [4,10,20,32,44,32,20,12,6];
 export const FLOOR_DRIFT = 1.35;
@@ -35,7 +37,7 @@ export const HERO_FAMILIES=[
   {short:'星圖',title:'星圖光牆',desc:'光點與連線在牆面構成獨立星圖，每間都有自己的座標。'},
   {short:'藏光',title:'稜鏡藏光架',desc:'錯位幾何框格與細光帶，組成一座不同形態的收藏裝置。'}
 ];
-export function getHero(id,seed){const type=id%HERO_FAMILIES.length,variant=Math.floor(id/HERO_FAMILIES.length),family=HERO_FAMILIES[type];const a=['晨','霧','森','月','潮','星','暮','雲'],b=['序','汐','弧','境','律','脈'];return {type,variant,seed:hash(seed,type,variant),name:`${family.short}・${a[variant%8]}${b[Math.floor(variant/8)%6]}`,title:family.title,description:family.desc,signature:`${type}:${variant}`};}
+export function getHero(id,seed){const type=id%HERO_FAMILIES.length,variant=Math.floor(id/HERO_FAMILIES.length),family=HERO_FAMILIES[type];const a=['晨','霧','森','月','潮','星','暮','雲'],b=['序','汐','弧','境','律','脈','嶼','澄','影','穹','紋','嵐','瀾','泉','岫'];return {type,variant,seed:hash(seed,type,variant),name:`${family.short}・${a[variant%8]}${b[Math.floor(variant/8)%b.length]}`,title:family.title,description:family.desc,signature:`${type}:${variant}`};}
 export function getHeroAnchor(room){const index=room.faces===6?room.local.reduce((best,p,i)=>Math.hypot(...p)>Math.hypot(...room.local[best])?i:best,0):room.hero.variant%room.poly.length;const p=room.poly[index],fraction=room.faces===4?.43:.64;return {x:room.center[0]+(p[0]-room.center[0])*fraction,z:room.center[1]+(p[1]-room.center[1])*fraction,scale:room.faces===4?.62:room.faces===6?1.0:.85};}
 export function hash(a,b=0,c=0){let n=Math.imul(a+131,374761393)^Math.imul(b+911,668265263)^Math.imul(c+53,1274126177);n=Math.imul(n^(n>>>13),1274126177);return (n^(n>>>16))>>>0;}
 export function rng(seed){let a=seed>>>0;return ()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}

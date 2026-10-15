@@ -1,8 +1,8 @@
 {
   "name": "woodweave-habitat",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "type": "module",
   "private": true,
-  "description": "Nine-storey timber habitat with wool-felt interiors and adaptive detail",
+  "description": "Nine-storey timber habitat with 1080 unique wool-felt interiors and full-detail viewing",
   "scripts": {"build": "node build-standalone.mjs", "test": "node verify.mjs"}
 }

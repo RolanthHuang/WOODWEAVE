@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.min.js';
-import {rng} from './layout.js';
+import {rng,MAX_ROOMS,LABEL_COLUMNS,LABEL_ROWS} from './layout.js';
 
 // All surface images are generated locally. Colour and height maps use separate
 // colour spaces, so the weave and wood pores also respond to the real lights.
@@ -89,13 +89,14 @@ export function createTextureSet(){
   const contact=bitmap(128,(ctx,n)=>{
     const g=ctx.createRadialGradient(n/2,n/2,5,n/2,n/2,n/2);g.addColorStop(0,'rgba(33,35,25,.32)');g.addColorStop(.48,'rgba(33,35,25,.17)');g.addColorStop(1,'rgba(33,35,25,0)');ctx.fillStyle=g;ctx.fillRect(0,0,n,n);
   });
-  const label=bitmap(1024,(ctx,n)=>{
+  const label=bitmap(2048,(ctx,n)=>{
     ctx.fillStyle='#c7bda1';ctx.fillRect(0,0,n,n);ctx.fillStyle='#3c4c43';
-    // A single atlas retains legible individual room numbers without 360 textures.
-    for(let id=0;id<360;id++){
-      const x=(id%20)*51.2,y=Math.floor(id/20)*56.88;
-      ctx.font='bold 12px sans-serif';ctx.fillText(`W ${String(id+1).padStart(3,'0')}`,x+5,y+24);
-      ctx.fillRect(x+6,y+32,26,1);ctx.font='5px sans-serif';ctx.fillText('PRIVATE SUITE',x+6,y+43);
+    // One shared atlas covers every plaque, including the four-digit room numbers.
+    const cellWidth=n/LABEL_COLUMNS,cellHeight=n/LABEL_ROWS;
+    for(let id=0;id<MAX_ROOMS;id++){
+      const x=(id%LABEL_COLUMNS)*cellWidth,y=Math.floor(id/LABEL_COLUMNS)*cellHeight;
+      ctx.font='bold 13px sans-serif';ctx.fillText(`W ${String(id+1).padStart(3,'0')}`,x+5,y+cellHeight*.42);
+      ctx.fillRect(x+6,y+cellHeight*.58,cellWidth-12,1);ctx.font='5px sans-serif';ctx.fillText('PRIVATE SUITE',x+6,y+cellHeight*.78);
     }
   });
   return {wood,woodHeight,woodRoughness,floor,textile,textileHeight,wool,woolHeight,woodfelt,woodfeltHeight,stone,screen,contact,label};
